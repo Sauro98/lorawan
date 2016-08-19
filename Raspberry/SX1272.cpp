@@ -4498,7 +4498,7 @@ int8_t SX1272::getPacket(uint16_t wait)
 #ifdef W_REQUESTED_ACK
             // added by C. Pham
             // need to send an ACK
-            if (packet_received.type & PKT_TYPE_REQUEST_ACK) {
+            if (packet_received.type == PKT_TYPE_REQUEST_ACK) {
                 state = 5;
                 _requestACK_indicator=1;
             }
