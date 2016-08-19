@@ -698,22 +698,6 @@ public:
 	 */
 	uint8_t getPayloadLength();
 
-	//! It sets the packet length to send/receive.
-  	/*!
-  	It stores in global '_payloadlength' variable the payload length of
-    the last packet to send/receive.
-	\return '0' on success, '1' otherwise
-	 */
-	int8_t setPacketLength();
-
-	//! It sets the packet length to send/receive.
-  	/*!
-  	It stores in global '_payloadlength' variable the payload length of
-    the last packet to send/receive.
-  	\param uint8_t l : payload length to set in the configuration.
-	\return '0' on success, '1' otherwise
-	 */
-	int8_t setPacketLength(uint8_t l);
 
 	//! It gets the node address of the mote.
   	/*!
