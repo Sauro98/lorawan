@@ -4451,6 +4451,7 @@ int8_t SX1272::getPacket(uint16_t wait)
 
         //Commentato da Ivano 18/08/2016 lenght non esiste più - > packet_received.length = readRegister(REG_RX_NB_BYTES);
 		int l = readRegister(REG_RX_NB_BYTES) -1 -4 -1 -2 -1;
+		packet_sent.length = l;
 		printf("lenght : %d\n",l);
             for(unsigned int i = 0; i < l; i++)
             {
@@ -4460,7 +4461,6 @@ int8_t SX1272::getPacket(uint16_t wait)
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
 				printf("hex : %04x , dec : %d\n",packet_received.data[i], packet_received.data[i]);
             }
-			data[l] = '/0';
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);
 
