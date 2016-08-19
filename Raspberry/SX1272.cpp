@@ -318,6 +318,7 @@ uint8_t SX1272::ON()
 #endif
 
     // added by C. Pham
+
     // default sync word for non-LoRaWAN
     setSyncWord(_defaultSyncWord);
     getSyncWord();
