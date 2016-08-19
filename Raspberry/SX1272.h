@@ -1,26 +1,27 @@
-/*
+/* 
  *  Library for LoRa 868 / 915MHz SX1272 LoRa module
- *
- *  Copyright (C) Libelium Comunicaciones Distribuidas S.L.
- *  http://www.libelium.com
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  
+ *  Copyright (C) Libelium Comunicaciones Distribuidas S.L. 
+ *  http://www.libelium.com 
+ *  
+ *  This program is free software: you can redistribute it and/or modify 
+ *  it under the terms of the GNU General Public License as published by 
+ *  the Free Software Foundation, either version 3 of the License, or 
+ *  (at your option) any later version. 
+ *  
+ *  This program is distributed in the hope that it will be useful, 
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
  *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see http://www.gnu.org/licenses/.
- *
+ *  
+ *  You should have received a copy of the GNU General Public License 
+ *  along with this program.  If not, see http://www.gnu.org/licenses/. 
+ *  
  *  Version:           1.1
- *  Design:            David Gascón
+ *  Design:            David Gascón 
  *  Implementation:    Covadonga Albiñana & Victor Boria
  */
+
 
 #ifndef SX1272_h
 #define SX1272_h
@@ -29,11 +30,13 @@
  * Includes
  ******************************************************************************/
 
-#include <stdlib.h>
 #include <stdint.h>
-#include <SPI.h>
 
-#pragma region define_region
+#ifdef RASPBERRY2
+#include "arduPi_pi2.h"
+#else
+#include "arduPi.h"
+#endif
 
 #ifndef inttypes_h
 	#include <inttypes.h>
@@ -47,17 +50,13 @@
 #define W_REQUESTED_ACK
 //#define W_NET_KEY
 //#define W_INITIALIZATION
-#define SX1272_RST  4
-
-#if defined ARDUINO_AVR_PRO || defined ARDUINO_AVR_NANO || defined ARDUINO_AVR_MINI || defined __MK20DX256__
-#define SX1272_SS 8
-#else
-#define SX1272_SS D1
-#endif
+#define SX1272_RST  7
 
 #define SX1272Chip  0
 #define SX1276Chip  1
 // end
+
+#define SX1272_SS 10
 
 #define SX1272_debug_mode 0
 
@@ -152,10 +151,10 @@
 #define        REG_SEQ_CONFIG2	  				0x37
 #define        REG_DETECTION_THRESHOLD          0x37
 #define        REG_TIMER_RESOL	  				0x38
+#define        REG_TIMER1_COEF	  				0x39
 // added by C. Pham
 #define        REG_SYNC_WORD                    0x39
 //end
-#define        REG_TIMER1_COEF	  				0x39
 #define        REG_TIMER2_COEF	  				0x3A
 #define        REG_IMAGE_CAL	  				0x3B
 #define        REG_TEMP		  					0x3C
@@ -218,7 +217,6 @@
 
 //FREQUENCY CHANNELS:
 const uint32_t CH_10_868 = 0xD84CCC; // channel 10, central freq = 865.20MHz
-									 // = 865200000*RH_LORA_FCONVERT
 const uint32_t CH_11_868 = 0xD86000; // channel 11, central freq = 865.50MHz
 const uint32_t CH_12_868 = 0xD87333; // channel 12, central freq = 865.80MHz
 const uint32_t CH_13_868 = 0xD88666; // channel 13, central freq = 866.10MHz
@@ -229,7 +227,7 @@ const uint32_t CH_17_868 = 0xD90000; // channel 17, central freq = 868.00MHz
 
 // added by C. Pham
 const uint32_t CH_18_868 = 0xD90666; // 868.1MHz for LoRaWAN test
-// end
+
 const uint32_t CH_00_900 = 0xE1C51E; // channel 00, central freq = 903.08MHz
 const uint32_t CH_01_900 = 0xE24F5C; // channel 01, central freq = 905.24MHz
 const uint32_t CH_02_900 = 0xE2D999; // channel 02, central freq = 907.40MHz
@@ -295,8 +293,8 @@ const uint8_t LORA_RX_MODE = 0x85;
 const uint8_t LORA_CAD_MODE = 0x87;
 #define LNA_MAX_GAIN                0x23
 #define LNA_OFF_GAIN                0x00
-#define LNA_LOW_GAIN		    0x20
-// end
+#define LNA_LOW_GAIN		    	0x20
+//end
 
 const uint8_t LORA_STANDBY_FSK_REGS_MODE = 0xC1;
 
@@ -319,10 +317,8 @@ const uint8_t MAX_LENGTH = 255;
 const uint8_t MAX_PAYLOAD = 244;
 const uint8_t MAX_LENGTH_FSK = 64;
 const uint8_t MAX_PAYLOAD_FSK = 60;
-
 //Modified by Ivano 18/08/2016 this is not the way we recognize ack anymore
 const uint8_t ACK_LENGTH = 2;
-
 // added by C. Pham
 #ifdef W_NET_KEY
 const uint8_t NET_KEY_LENGTH=2;
@@ -330,8 +326,7 @@ const uint8_t OFFSET_PAYLOADLENGTH = 4+NET_KEY_LENGTH;
 const uint8_t net_key_0 = 0x12;
 const uint8_t net_key_1 = 0x34;
 #else
-// modified by C. Pham to remove the retry field and the length field
-// which will be replaced by packet type field
+// modified by C. Pham to remove the retry field
 const uint8_t OFFSET_PAYLOADLENGTH = 4;
 #endif
 const uint8_t OFFSET_RSSI = 137;
@@ -343,6 +338,9 @@ const uint8_t MAX_RETRIES = 5;
 const uint8_t CORRECT_PACKET = 0;
 const uint8_t INCORRECT_PACKET = 1;
 
+// added by C. Pham
+// Packet type definition
+
 //Added by Ivano 18/08/2016
 #define PKT_FCTRL_DATA 0x00
 #define PKT_FCTRL_ACK 0x20
@@ -351,25 +349,22 @@ const uint8_t INCORRECT_PACKET = 1;
 #define PKT_TYPE_NO_ACK 0x40
 
 #define NETWORK_ID 0x4D
-#define NETWORK_ADDRESS 0xB
+#define NETWORK_ADDRESS 0xF
 
 #define F_PORT 10
 //
-
-
-#pragma endregion Define
 
 //! Structure :
 /*!
  */
 struct pack
 {
-	// added by C. Pham
+        // added by C. Pham
 #ifdef W_NET_KEY
-	uint8_t netkey[NET_KEY_LENGTH];
+        uint8_t netkey[NET_KEY_LENGTH];
 #endif
 
-    //Aggiunta da Ivano 18/08/2016
+   //Aggiunta da Ivano 18/08/2016
 	// type 01000000 - 0x40 non richiedere ack
 	// type 10000000 - 0x80 richiedi ack
     uint8_t type;
@@ -381,6 +376,7 @@ struct pack
 	//Aggiunta da Ivano 18/08/2016
 	// due byte di contatore di pacchetto
 	uint16_t packnum;
+
 
 	//! Structure Variable : Packet payload
 	/*!
@@ -395,7 +391,6 @@ struct pack
 	//Aggiunta da Ivano 18/08/2016
 	//porta arbitraria da 1 a 223, ho sceto 10
 	uint8_t fPort;
-	 
 };
 
 /******************************************************************************
@@ -418,7 +413,40 @@ public:
 	\param void
 	\return void
   	 */
-   	SX1272();
+   	SX1272()
+    {
+		// Initialize class variables
+		_bandwidth = BW_125;
+		_codingRate = CR_5;
+		_spreadingFactor = SF_7;
+		_channel = CH_12_900;
+		_header = HEADER_ON;
+		_CRC = CRC_OFF;
+		_modem = FSK;
+		_power = 15;
+		_packetNumber = 0;
+		_reception = CORRECT_PACKET;
+        _retries = 0;
+        // added by C. Pham
+        _defaultSyncWord=0x12;
+        _rawFormat=false;
+        _extendedIFS=true;
+        _RSSIonSend=true;
+        // disabled by default
+        _enableCarrierSense=false;
+        // DIFS by default
+        _send_cad_number=9;
+#ifdef W_REQUESTED_ACK
+        _requestACK = 0;
+#endif
+#ifdef W_NET_KEY
+        _my_netkey[0] = net_key_0;
+        _my_netkey[1] = net_key_1;
+#endif
+		_maxRetries = 3;
+		//Commentato da ivano 18/08/2016
+    	//packet_sent.retry = _retries;
+	};
 
 	//! It puts the module ON
   	/*!
@@ -841,6 +869,12 @@ public:
   	 *
 	\return '0' on success, '1' otherwise
 	 */
+	 
+	 
+	//Added by Ivano 19/08/2016
+
+	void setType(uint8_t type);
+	 
 	uint8_t receiveAll();
 
 	//! It puts the module in 'promiscuous' reception mode with a timeout.
@@ -1099,14 +1133,6 @@ public:
 	*/
 	uint8_t sendPacketTimeoutACKRetries(uint8_t dest, char *payload);
 
-
-
-
-	//Added by Ivano 19/08/2016
-
-	void setType(uint8_t type);
-
-
 	//! It sends a packet, waits to receive an ACK and updates the _retries value.
 	/*!
 	\param uint8_t dest : packet destination.
@@ -1142,15 +1168,14 @@ public:
 	*/
 	uint8_t getTemp();
 
-    // added by C. Pham
-    void setPacketFctrl(uint8_t type);
+        // added by C. Pham
+    void setPacketType(uint8_t type);
     void RxChainCalibration();
     uint8_t doCAD(uint8_t counter);
     uint16_t getToA(uint8_t pl);
     void CarrierSense();
     int8_t setSyncWord(uint8_t sw);
     int8_t getSyncWord();
-    int8_t setSleepMode();
 
     // SX1272 or SX1276?
     uint8_t _board;
@@ -1169,16 +1194,16 @@ public:
     int8_t _rcv_snr_in_ack;
 
 #ifdef W_REQUESTED_ACK
-	uint8_t _requestACK;
-	uint8_t _requestACK_indicator;
+    uint8_t _requestACK;
+    uint8_t _requestACK_indicator;
 #endif
 
 #ifdef W_NET_KEY
-	uint8_t _my_netkey[NET_KEY_LENGTH];
-        uint8_t _the_net_key_0;
-        uint8_t _the_net_key_1;
+    uint8_t _my_netkey[NET_KEY_LENGTH];
+    uint8_t _the_net_key_0;
+    uint8_t _the_net_key_1;
 #endif
-	// end
+    //end
 
 	/// Variables /////////////////////////////////////////////////////////////
 
@@ -1253,8 +1278,6 @@ public:
    	*/
 	int8_t _RSSI;
 
-
-
 	//! Variable : RSSI from the last packet received in LoRa mode.
 	//!
   	/*!
@@ -1307,7 +1330,7 @@ public:
 	//!
   	/*!
    	*/
-	uint16_t _packetNumber;
+	uint8_t _packetNumber;
 
 	//! Variable : indicates if received packet is correct or incorrect.
 	//!
@@ -1369,11 +1392,14 @@ public:
    	*/
 	uint16_t _sendTime;
 
+private:
+
+	void maxWrite16();
+
+	char txbuf[2];
+	char rxbuf[2];
 };
 
 extern SX1272	sx1272;
-
-
-
 
 #endif
