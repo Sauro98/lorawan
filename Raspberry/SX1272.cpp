@@ -4171,7 +4171,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 				//IVANO
 				//this is actually the source now
-				readRegister(REG_FIFO)//leave out the type
+				readRegister(REG_FIFO);//leave out the type
                 _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO)<<8 | readRegister(REG_FIFO)<<16 | readRegister(REG_FIFO)<<24;
             }
         }
