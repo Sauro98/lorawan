@@ -441,8 +441,7 @@ public:
         _my_netkey[0] = net_key_0;
         _my_netkey[1] = net_key_1;
 #endif
-		_maxRetries = 3;
-		packet_sent.retry = _retries;
+		//Retries removed by Ivano 19/08/2016
 	};
 
 	//! It puts the module ON

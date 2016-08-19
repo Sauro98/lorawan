@@ -3682,23 +3682,23 @@ uint8_t SX1272::setACK()
         writeRegister(REG_FIFO, ACK.data[1]);	// Writing the ACK in FIFO
 
         //#if (SX1272_debug_mode > 0)
-        printf("## ACK set and written in FIFO ##\n");
-        // Print the complete ACK if debug_mode
-        printf("## ACK to send:\n");
-        printf("Destination: ");
-        printf("%d\n", ACK.dst);			 	// Printing destination
-        printf("Source: ");
-        printf("%d\n", ACK.src);			 	// Printing source
-        printf("ACK number: ");
-        printf("%d\n", ACK.packnum);			// Printing ACK number
-        printf("ACK length: ");
-        printf("%d\n", ACK.length);				// Printing ACK length
-        printf("ACK payload: ");
-        printf("%d\n", ACK.data[0]);			// Printing ACK payload
-        printf("ACK SNR last rcv pkt: ");
-        printf("%d\n", _SNR);
-        printf(" ##\n");
-        printf("\n");
+		Serial.println(F("## ACK set and written in FIFO ##"));
+		// Print the complete ACK if debug_mode
+		Serial.println(F("## ACK to send:"));
+		/*Serial.print(F("Destination: "));
+		Serial.println(ACK.dst);	*/		 	// Printing destination
+		Serial.print(F("Source: "));
+		Serial.println(ACK.src);			 	// Printing source
+		Serial.print(F("ACK number: "));
+		Serial.println(ACK.packnum);			// Printing ACK number
+												/*Serial.print(F("ACK length: "));
+												Serial.println(ACK.length);		*/		// Printing ACK length
+		Serial.print(F("ACK payload: "));
+		Serial.println(ACK.data[0]);			// Printing ACK payload
+		Serial.print(F("ACK SNR last rcv pkt: "));
+		Serial.println(_SNR);
+		Serial.println(F("##"));
+		Serial.println();
         //#endif
 
         state = 0;
