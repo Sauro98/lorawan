@@ -3,7 +3,8 @@ include radio.makefile
 lora_gateway: lora_gateway.o arduPi.o SX1272.o
 	g++ -lrt -lpthread lora_gateway.o arduPi.o SX1272.o -o lora_gateway	
 
-lora_gateway_pi2: lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o
+lora_gateway_pi2: lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o 
+	g++ -c ReceivedPacketsHandler.cpp
 	g++ -lrt -lpthread lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o -o lora_gateway_pi2
 	rm -f lora_gateway
 	ln -s lora_gateway_pi2 ./lora_gateway
