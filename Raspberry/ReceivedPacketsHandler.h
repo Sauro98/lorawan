@@ -6,7 +6,7 @@
 #include <stdio.h>//for c string formatting
 #include <sys/time.h>//for formatting the timestamp
 #include <time.h>//for formatting the timestamp
-#include<string>//for addictional handling of strings
+#include <string>//for addictional handling of strings
 #include "SX1272.h"//for passing the pack struct  directly in the constructor
 
 
