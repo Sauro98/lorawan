@@ -4450,15 +4450,15 @@ int8_t SX1272::getPacket(uint16_t wait)
         }
 
         //Commentato da Ivano 18/08/2016 lenght non esiste più - > packet_received.length = readRegister(REG_RX_NB_BYTES);
-
-         /*   for(unsigned int i = 0; i < 200; i++)
+		int l = readRegister(REG_RX_NB_BYTES);
+            for(unsigned int i = 0; i < l; i++)
             {
 				//Added by Ivano 18/08/2016
 				//Test to be removed in days
 				printf(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
 				printf("%d\n",packet_received.data[i]);
-            }*/
+            }
 
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);
