@@ -8,9 +8,9 @@ void ReceivedPacket::printPacket(){
 	printf("--Mittente arduino #%d, pacchetto #%d\n",arduinoSenderID,packetNumber);
 	printf("--Sensore #%d\n",sensorID);
 	printf("--Contenuto :  ");
-	for (int a = 0; a < pl; a++) {
+	/*for (int a = 0; a < pl; a++) {
 		printf(" %d",data[a]);
-	}
+	}*/
 	printf("\n-----------------------------------------------------------\n");
 	return;
 }
@@ -36,7 +36,9 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	a++;
 	//gli altri quattro byte sono i dati effettivi dei sensori
 	// - 5 perchè il protocollo lora gli assegna 4 bytes vuoti aggiuntivi alla fine del pacchetto + l'identificativo del sensore
-	pl = originalPacket.length - 5;
+
+
+	/*pl = originalPacket.length - 5;
 	if (debug) {
 		printf("original packet lenght : %d\n", originalPacket.length);
 		printf("packet lenght : %d\n", pl);
@@ -49,7 +51,7 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	}
 	if (debug) {
 		printf("outside for loop\n");
-	}
+	}*/
 }
 
 ReceivedPacket::ReceivedPacket(pack originalPacket, int _gw_id) {
@@ -149,7 +151,8 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	for (int a = 0; a < pl; a++) {
+	
+	/*for (int a = 0; a < pl; a++) {
 
 
 		if (a != pl - 1) {
@@ -169,7 +172,7 @@ std::string ReceivedPacket::generateJSON(){
 	if (debug) {
 		printf("%s \n", buffer);
 	}
-	json += buffer;
+	json += buffer;*/
 
 	return json;
 }

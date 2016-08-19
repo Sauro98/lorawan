@@ -1201,6 +1201,7 @@ public:
 #endif
     //end
 
+
 	/// Variables /////////////////////////////////////////////////////////////
 
 	//! Variable : bandwidth configured in LoRa mode.
