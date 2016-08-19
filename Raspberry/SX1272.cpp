@@ -5852,4 +5852,403 @@ void SX1272::setPacketFctrl(uint8_t type)
 
 }
 
+/*
+Function: Configures the module to perform CAD.
+Returns: Integer that determines if the number of requested CAD have been successfull
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
+*/
+uint8_t SX1272::doCAD(uint8_t counter)
+{
+	uint8_t state = 2;
+	byte value = 0x00;
+	unsigned long startCAD, endCAD, startDoCad, endDoCad, previous;
+	uint16_t wait = 100;
+	bool failedCAD = false;
+	uint8_t retryCAD = 3;
+	uint8_t save_counter;
+	byte st0;
+
+	st0 = readRegister(REG_OP_MODE);	// Save the previous status
+
+#ifdef DEBUG_CAD
+	printf("SX1272::Starting 'doCAD'\n");
+#endif
+
+	save_counter = counter;
+
+	startDoCad = millis();
+
+	if (_modem == LORA) { // LoRa mode
+
+		writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);
+
+		do {
+
+			// wait to CadDone flag
+			startCAD = previous = millis();
+
+			clearFlags();	// Initializing flags
+
+			writeRegister(REG_OP_MODE, LORA_CAD_MODE);  // LORA mode - Cad
+
+			value = readRegister(REG_IRQ_FLAGS);
+			// Wait until CAD ends (CAD Done flag) or the timeout expires
+			while ((bitRead(value, 2) == 0) && (millis() - previous < wait))
+			{
+				value = readRegister(REG_IRQ_FLAGS);
+				// Condition to avoid an overflow (DO NOT REMOVE)
+				if (millis() < previous)
+				{
+					previous = millis();
+				}
+			}
+			state = 1;
+
+			endCAD = millis();
+
+			if (bitRead(value, 2) == 1)
+			{
+				state = 0;	// CAD successfully performed
+#ifdef DEBUG_CAD				  
+				printf("SX1272::CAD duration ");
+				printf("%d\n", endCAD - startCAD);
+				printd("SX1272::CAD successfully performed\n");
+#endif				  
+
+				value = readRegister(REG_IRQ_FLAGS);
+
+				// look for the CAD detected bit
+				if (bitRead(value, 0) == 1)
+				{
+					// we detected activity
+					failedCAD = true;
+#ifdef DEBUG_CAD				  		
+					printf("SX1272::CAD exits after ");
+					printf("%d\n", save_counter - counter);
+#endif				  		
+				}
+
+				counter--;
+			}
+			else
+			{
+#ifdef DEBUG_CAD			  	 	
+				printf("SX1272::CAD duration "));
+				printf("%d\n", endCAD - startCAD);
+#endif				  
+				if (state == 1)
+				{
+#ifdef DEBUG_CAD
+					printf("SX1272::Timeout has expired\n");
+#endif
+				}
+				else
+				{
+#ifdef DEBUG_CAD
+					printf("SX1272::Error and CAD has not been performed\n");
+#endif
+				}
+
+				retryCAD--;
+
+				// to many errors, so exit by indicating that channel is not free
+				if (!retryCAD)
+					failedCAD = true;
+			}
+
+		} while (counter && !failedCAD);
+	}
+
+	writeRegister(REG_OP_MODE, st0);
+
+	endDoCad = millis();
+
+	clearFlags();		// Initializing flags
+
+#ifdef DEBUG_CAD	  
+	printf("SX1272::doCAD duration ");
+	printf("%d\n", endDoCad - startDoCad);
+#endif
+
+	if (failedCAD)
+		return 2;
+
+	return state;
+}
+
+
+uint16_t SX1272::getToA(uint8_t pl) {
+
+	uint8_t DE = 0;
+	uint32_t airTime = 0;
+
+	double bw = 0.0;
+
+	bw = (_bandwidth == BW_125) ? 125e3 : ((_bandwidth == BW_250) ? 250e3 : 500e3);
+
+#ifdef DEBUG_GETTOA
+	printf("SX1272::bw is ");
+	printf("%d\n", bw);
+
+	printf("SX1272::SF is ");
+	printf("%d\n", _spreadingFactor);
+#endif
+
+	//double ts=pow(2,_spreadingFactor)/bw;
+
+	////// from LoRaMAC SX1272GetTimeOnAir()
+
+	// Symbol rate : time for one symbol (secs)
+	double rs = bw / (1 << _spreadingFactor);
+	double ts = 1 / rs;
+
+	// must add 4 to the programmed preamble length to get the effective preamble length
+	double tPreamble = ((_preamblelength + 4) + 4.25)*ts;
+
+#ifdef DEBUG_GETTOA	
+	printf("SX1272::ts is ");
+	printf("%f\n", ts);
+	printf("SX1272::tPreamble is ");
+	printf("%f\n", tPreamble);
+#endif
+
+	// for low data rate optimization
+	if ((_bandwidth == BW_125) && _spreadingFactor == 12)
+		DE = 1;
+
+	// Symbol length of payload and time
+	double tmp = (8 * pl - 4 * _spreadingFactor + 28 + 16 - 20 * _header) /
+		(double)(4 * (_spreadingFactor - 2 * DE));
+
+#ifdef DEBUG_GETTOA                         
+	printf("SX1272::tmp is ");
+	printf("%f\n", tmp);
+#endif
+
+	tmp = ceil(tmp)*(_codingRate + 4);
+
+	double nPayload = 8 + ((tmp > 0) ? tmp : 0);
+
+#ifdef DEBUG_GETTOA    
+	printf("SX1272::nPayload is ");
+	printf("%d\n", nPayload);
+#endif
+
+	double tPayload = nPayload * ts;
+	// Time on air
+	double tOnAir = tPreamble + tPayload;
+	// in us secs
+	airTime = floor(tOnAir * 1e6 + 0.999);
+
+	//////
+
+#ifdef DEBUG_GETTOA    
+	printf("SX1272::airTime is ");
+	printf("%d\n", airTime);
+#endif
+	// return in ms
+	return ceil(airTime / 1000) + 1;
+}
+
+// need to set _send_cad_number to a value > 0
+// we advise using _send_cad_number=3 for a SIFS and _send_cad_number=9 for a DIFS
+// prior to send any data
+void SX1272::CarrierSense() {
+
+	int e;
+	bool carrierSenseRetry = false;
+
+	if (_send_cad_number && _enableCarrierSense) {
+		do {
+			do {
+
+				// check for free channel (SIFS/DIFS)
+				_startDoCad = millis();
+				e = doCAD(_send_cad_number);
+				_endDoCad = millis();
+
+				printf("--> CAD duration ");
+				printf("%d\n", _endDoCad - _startDoCad);
+
+				if (!e) {
+					printf("OK1\n");
+
+					if (_extendedIFS) {
+						// wait for random number of CAD
+						uint8_t w = rand() % 8 + 1;
+
+						printf("--> waiting for ");
+						printf("%d", w);
+						printf(" CAD = ");
+						printf("%d\n", sx1272_CAD_value[_loraMode] * w);
+
+						delay(sx1272_CAD_value[_loraMode] * w);
+
+						// check for free channel (SIFS/DIFS) once again
+						_startDoCad = millis();
+						e = doCAD(_send_cad_number);
+						_endDoCad = millis();
+
+						printf("--> CAD duration ");
+						printf("%d\n", _endDoCad - _startDoCad);
+
+						if (!e)
+							printf("OK2\n");
+						else
+							printf("###2\n");
+					}
+				}
+				else {
+					printf("###1\n");
+
+					// wait for random number of DIFS
+					uint8_t w = rand() % 8 + 1;
+
+					printf("--> waiting for ");
+					printf("%d", w);
+					printf(" DIFS (DIFS=3SIFS) = ");
+					printf("%d\n", sx1272_SIFS_value[_loraMode] * 3 * w);
+
+					delay(sx1272_SIFS_value[_loraMode] * 3 * w);
+
+					printf("--> retry\n");
+				}
+
+			} while (e);
+
+			// CAD is OK, but need to check RSSI
+			if (_RSSIonSend) {
+
+				e = getRSSI();
+
+				uint8_t rssi_retry_count = 10;
+
+				if (!e) {
+
+					printf("--> RSSI ");
+					printf("%d\n", _RSSI);
+
+					while (_RSSI > -90 && rssi_retry_count) {
+
+						delay(1);
+						getRSSI();
+						printf("--> RSSI ");
+						printf("%d\n", _RSSI);
+						rssi_retry_count--;
+					}
+				}
+				else
+					printf("--> RSSI error\n");
+
+				if (!rssi_retry_count)
+					carrierSenseRetry = true;
+				else
+					carrierSenseRetry = false;
+			}
+
+		} while (carrierSenseRetry);
+	}
+}
+
+/*
+Function: Indicates the CR within the module is configured.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
+state = -1 --> Forbidden command for this protocol
+*/
+int8_t	SX1272::getSyncWord()
+{
+	int8_t state = 2;
+
+#if (SX1272_debug_mode > 1)
+	printf("\n");
+	printf("Starting 'getSyncWord'\n");
+#endif
+
+	if (_modem == FSK)
+	{
+		state = -1;		// sync word is not available in FSK mode
+#if (SX1272_debug_mode > 1)
+		printf("** FSK mode hasn't sync word **\n");
+#endif
+	}
+	else
+	{
+		_syncWord = readRegister(REG_SYNC_WORD);
+
+		state = 0;
+
+#if (SX1272_debug_mode > 1)
+		printf("## Sync word is ");
+		printf("%X", _syncWord);
+		printf(" ##\n");
+#endif
+	}
+	return state;
+}
+
+/*
+Function: Sets the sync word in the module.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
+state = -1 --> Forbidden command for this protocol
+Parameters:
+cod: sw is sync word value to set in LoRa modem configuration.
+*/
+int8_t	SX1272::setSyncWord(uint8_t sw)
+{
+	byte st0;
+	int8_t state = 2;
+	byte config1;
+
+#if (SX1272_debug_mode > 1)
+	printf("\n");
+	printf("Starting 'setSyncWord'\n");
+#endif
+
+	st0 = readRegister(REG_OP_MODE);		// Save the previous status
+
+	if (_modem == FSK)
+	{
+#if (SX1272_debug_mode > 1)
+		printf("## Notice that FSK hasn't sync word parameter, ");
+		printf("so you are configuring it in LoRa mode ##\n");
+#endif
+		state = setLORA();
+	}
+	writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);		// Set Standby mode to write in registers
+
+	writeRegister(REG_SYNC_WORD, sw);
+
+	delay(100);
+
+	config1 = readRegister(REG_SYNC_WORD);
+
+	if (config1 == sw) {
+		state = 0;
+		_syncWord = sw;
+#if (SX1272_debug_mode > 1)
+		printf("## Sync Word ");
+		printf("%X\n", sw);
+		printf(" has been successfully set ##\n");
+#endif
+	}
+	else {
+		state = 1;
+#if (SX1272_debug_mode > 1)
+		printf("** There has been an error while configuring Sync Word parameter **\n");
+#endif
+	}
+
+	writeRegister(REG_OP_MODE, st0);	// Getting back to previous status
+	delay(100);
+	return state;
+}
+
 SX1272 sx1272 = SX1272();
