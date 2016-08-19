@@ -4427,7 +4427,8 @@ int8_t SX1272::getPacket(uint16_t wait)
         {
             // comment by C. Pham
             // set the FIFO addr to 0 to read again all the bytes
-            writeRegister(REG_FIFO_ADDR_PTR, 0x80);  	// Setting address pointer in FIFO data buffer
+            writeRegister(REG_FIFO_ADDR_PTR, 0x00);  	// Setting address pointer in FIFO data buffer
+			packet_received.type = readRegister(REG_FIFO);		// tipo
 
 #ifdef W_NET_KEY
             // added by C. Pham
@@ -4438,7 +4439,6 @@ int8_t SX1272::getPacket(uint16_t wait)
         }
         // modified by C. Pham
         if (!_rawFormat) {
-            packet_received.type = readRegister(REG_FIFO);		// tipo
             packet_received.src = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) << 24;		// Src
 			packet_received.fCtrl = readRegister(REG_FIFO); //fctrl
 			packet_received.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 ;	// packNum
@@ -4457,14 +4457,14 @@ int8_t SX1272::getPacket(uint16_t wait)
 
         //Commentato da Ivano 18/08/2016 lenght non esiste più - > packet_received.length = readRegister(REG_RX_NB_BYTES);
 
-            for(unsigned int i = 0; i < 200; i++)
+         /*   for(unsigned int i = 0; i < 200; i++)
             {
 				//Added by Ivano 18/08/2016
 				//Test to be removed in days
 				printf(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
 				printf("%d\n",packet_received.data[i]);
-            }
+            }*/
 
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);
