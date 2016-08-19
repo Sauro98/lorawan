@@ -3672,7 +3672,7 @@ uint8_t SX1272::setACK()
 		printf("\n");
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
-			Serial.print("byte : ");
+			printf("byte : ");
 			Serial.println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
 		}
 
@@ -3685,17 +3685,17 @@ uint8_t SX1272::setACK()
 		Serial.println(F("## ACK set and written in FIFO ##"));
 		// Print the complete ACK if debug_mode
 		Serial.println(F("## ACK to send:"));
-		/*Serial.print(F("Destination: "));
+		/*printf(F("Destination: "));
 		Serial.println(ACK.dst);	*/		 	// Printing destination
-		Serial.print(F("Source: "));
+		printf(F("Source: "));
 		Serial.println(ACK.src);			 	// Printing source
-		Serial.print(F("ACK number: "));
+		printf(F("ACK number: "));
 		Serial.println(ACK.packnum);			// Printing ACK number
-												/*Serial.print(F("ACK length: "));
+												/*printf(F("ACK length: "));
 												Serial.println(ACK.length);		*/		// Printing ACK length
-		Serial.print(F("ACK payload: "));
+		printf(F("ACK payload: "));
 		Serial.println(ACK.data[0]);			// Printing ACK payload
-		Serial.print(F("ACK SNR last rcv pkt: "));
+		printf(F("ACK SNR last rcv pkt: "));
 		Serial.println(_SNR);
 		Serial.println(F("##"));
 		Serial.println();
@@ -4418,9 +4418,9 @@ int8_t SX1272::getPacket(uint16_t wait)
             {
 				//Added by Ivano 18/08/2016
 				//Test to be removed in days
-				Serial.print(" ");
+				printf(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
-				Serial.print(packet_received.data[i]);
+				printf(packet_received.data[i]);
             }
 
             // commented by C. Pham
@@ -4429,22 +4429,22 @@ int8_t SX1272::getPacket(uint16_t wait)
             // Print the packet if debug_mode
 #if (SX1272_debug_mode > 0)
             Serial.println(F("## Packet received:"));
-            Serial.print(F("Destination: "));		
-            Serial.print(F("Type: "));
+            printf(F("Destination: "));		
+            printf(F("Type: "));
             Serial.println(packet_received.type);			 	// Printing source
-            Serial.print(F("Source: "));
+            printf(F("Source: "));
             Serial.println(packet_received.src);			 	// Printing source
-            Serial.print(F("Packet number: "));
+            printf(F("Packet number: "));
             Serial.println(packet_received.packnum);			// Printing packet number
-            //Serial.print(F("Packet length: "));
+            //printf(F("Packet length: "));
             //Serial.println(packet_received.length);			// Printing packet length
-            Serial.print(F("Data: "));
+            printf(F("Data: "));
             for(unsigned int i = 0; i < _payloadlength; i++)
             {
-                Serial.print((char)packet_received.data[i]);		// Printing payload
+                printf((char)packet_received.data[i]);		// Printing payload
             }
             Serial.println();
-            //Serial.print(F("Retry number: "));
+            //printf(F("Retry number: "));
             //Serial.println(packet_received.retry);			// Printing number retry
             Serial.println(F("##"));
             Serial.println();
@@ -4968,8 +4968,8 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
     _reception = CORRECT_PACKET;	// Updating incorrect value
   
 #if (SX1272_debug_mode > 0)
-       /* Serial.print(F("** Retrying to send last packet "));
-        Serial.print(_retries, DEC);
+       /* printf(F("** Retrying to send last packet "));
+        printf(_retries, DEC);
         Serial.println(F(" time **"));*/
 #endif
     
@@ -5012,7 +5012,7 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 		printf("\n");
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
-			Serial.print("byte : ");
+			printf("byte : ");
 			Serial.println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
 		}
 
@@ -5028,23 +5028,23 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
         /*Serial.println(F("## Packet set and written in FIFO ##"));
         // Print the complete packet if debug_mode
         Serial.println(F("## Packet to send: "));
-        Serial.print(F("Destination: "));
+        printf(F("Destination: "));
         Serial.println(packet_sent.dst);			 	// Printing destination
-        Serial.print(F("Packet type: "));
+        printf(F("Packet type: "));
         Serial.println(packet_sent.type);			// Printing packet type
-        Serial.print(F("Source: "));
+        printf(F("Source: "));
         Serial.println(packet_sent.src);			 	// Printing source
-        Serial.print(F("Packet number: "));
+        printf(F("Packet number: "));
         Serial.println(packet_sent.packnum);			// Printing packet number
-        Serial.print(F("Packet length: "));
+        printf(F("Packet length: "));
         Serial.println(packet_sent.length);			// Printing packet length
-        Serial.print(F("Data: "));
+        printf(F("Data: "));
         for(unsigned int i = 0; i < _payloadlength; i++)
         {
-            Serial.print((char)packet_sent.data[i]);		// Printing payload
+            printf((char)packet_sent.data[i]);		// Printing payload
         }
         Serial.println();
-        //Serial.print(F("Retry number: "));
+        //printf(F("Retry number: "));
         //Serial.println(packet_sent.retry);			// Printing retry number
         Serial.println(F("##"));*/
 #endif
@@ -5087,8 +5087,8 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 	_reception = CORRECT_PACKET;	// Updating incorrect value
 
 #if (SX1272_debug_mode > 0)
-									/* Serial.print(F("** Retrying to send last packet "));
-									Serial.print(_retries, DEC);
+									/* printf(F("** Retrying to send last packet "));
+									printf(_retries, DEC);
 									Serial.println(F(" time **"));*/
 #endif
 
@@ -5126,7 +5126,7 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 		printf("\n");
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
-			Serial.print("byte : ");
+			printf("byte : ");
 			Serial.println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
 		}
 
@@ -5143,23 +5143,23 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 		Serial.println(F("## Packet set and written in FIFO ##"));
 		// Print the complete packet if debug_mode
 		Serial.println(F("## Packet to send: "));
-		Serial.print(F("Destination: "));
+		printf(F("Destination: "));
 		Serial.println(packet_sent.dst);			 	// Printing destination
-		Serial.print(F("Packet type: "));
+		printf(F("Packet type: "));
 		Serial.println(packet_sent.type);			// Printing packet type
-		Serial.print(F("Source: "));
+		printf(F("Source: "));
 		Serial.println(packet_sent.src);			 	// Printing source
-		Serial.print(F("Packet number: "));
+		printf(F("Packet number: "));
 		Serial.println(packet_sent.packnum);			// Printing packet number
-		Serial.print(F("Packet length: "));
+		printf(F("Packet length: "));
 		Serial.println(packet_sent.length);			// Printing packet length
-		Serial.print(F("Data: "));
+		printf(F("Data: "));
 		for(unsigned int i = 0; i < _payloadlength; i++)
 		{
-		Serial.print((char)packet_sent.data[i]);		// Printing payload
+		printf((char)packet_sent.data[i]);		// Printing payload
 		}
 		Serial.println();
-		//Serial.print(F("Retry number: "));
+		//printf(F("Retry number: "));
 		//Serial.println(packet_sent.retry);			// Printing retry number
 		Serial.println(F("##"));
 #endif
@@ -5771,19 +5771,19 @@ uint8_t SX1272::getACK(uint16_t wait)
                                 //#if (SX1272_debug_mode > 0)
                                 // Printing the received ACK
                                 Serial.println(F("## ACK received:"));
-                                Serial.print(F("Type: "));
+                                printf(F("Type: "));
                                 Serial.println(ACK.type);			 	// Printing destination
-                                Serial.print(F("Source: "));
+                                printf(F("Source: "));
                                 Serial.println(ACK.src);			 	// Printing source
-                                Serial.print(F("ACK number: "));
+                                printf(F("ACK number: "));
                                 Serial.println(ACK.packnum);			// Printing ACK number
-                                Serial.print(F("ACK fCtrl: "));
+                                printf(F("ACK fCtrl: "));
                                 Serial.println(ACK.fCtrl);				// Printing ACK fctrl
-								Serial.print(F("ACK fPort: "));
+								printf(F("ACK fPort: "));
 								Serial.println(ACK.fPort);              // Printing ACK fport
-                                Serial.print(F("ACK payload: "));
+                                printf(F("ACK payload: "));
                                 Serial.println(ACK.data[0]);			// Printing ACK payload
-                                Serial.print(F("ACK SNR of rcv pkt at gw: "));
+                                printf(F("ACK SNR of rcv pkt at gw: "));
 
                                 value = ACK.data[1];
 
