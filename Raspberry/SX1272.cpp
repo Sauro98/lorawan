@@ -3646,7 +3646,7 @@ uint8_t SX1272::setACK()
 		ACK.fCtrl = PKT_FCTRL_ACK;
         ACK.type = PKT_TYPE_NO_ACK;
 		//Modificato da Ivano 18/08/2016 ora il dst è a 32 bit
-        ACK.src = NETWORK_ADDRESS <<25 | NETWORK_ID; // ACK source is packet destination
+        ACK.src = NETWORK_ADDRESS << 25 | NETWORK_ID; // ACK source is packet destination
 		ACK.fPort = F_PORT;
         ACK.packnum = packet_received.packnum; // packet number that has been correctly received
         ACK.data[0] = _reception;	// CRC of the received packet
@@ -3663,18 +3663,18 @@ uint8_t SX1272::setACK()
 
 		for (int a = 0; a < 4; a++) {
 
-			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
+			writeRegister(REG_FIFO, MID(ACK.src, (8 * a), (8 * (a + 1))));
 			printf("byte : MID( %d , %d ) ", (8 * a), (8 * (a + 1)));
-			printf("%x\n",MID(packet_sent.src, (8 * a), (8 * (a + 1))));//4 byte di src
+			printf("%x\n",MID(ACK.src, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
         writeRegister(REG_FIFO, ACK.fCtrl); //fCtrl
 
 		printf("\n");
 		for (int a = 0; a < 2; a++) {
-			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
+			writeRegister(REG_FIFO, MID(ACK.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
 			printf("byte : ");
-			printf("%x \n",MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
+			printf("%x \n",MID(ACK.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, ACK.fPort);
