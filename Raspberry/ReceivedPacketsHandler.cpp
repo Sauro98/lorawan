@@ -8,9 +8,9 @@ void ReceivedPacket::printPacket(){
 	printf("--Mittente arduino #%d, pacchetto #%d\n",arduinoSenderID,packetNumber);
 	printf("--Sensore #%d\n",sensorID);
 	printf("--Contenuto :  ");
-	/*for (int a = 0; a < pl; a++) {
+	for (int a = 0; a < pl; a++) {
 		printf(" %d",data[a]);
-	}*/
+	}
 	printf("\n-----------------------------------------------------------\n");
 	return;
 }
@@ -34,16 +34,12 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	//il primo byte del pacchetto rappresenta l'id del sensore che hai fatto scattare l''invio del messaggio
 	sensorID = originalPacket.data[a];
 	a++;
-	//gli altri quattro byte sono i dati effettivi dei sensori
-	// - 5 perchè il protocollo lora gli assegna 4 bytes vuoti aggiuntivi alla fine del pacchetto + l'identificativo del sensore
-
-
-	/*pl = originalPacket.length - 5;
+	//gli altri byte sono i dati effettivi dei sensori
+	pl = originalPacket.length;
 	if (debug) {
-		printf("original packet lenght : %d\n", originalPacket.length);
-		printf("packet lenght : %d\n", pl);
+		printf("packet lenght : %d\n", originalPacket.length);
 	}
-	for (; a< pl +1 ; a++) {
+	for (; a< pl + 1 ; a++) {
 		if (debug) {
 			printf("inside for loop copying %d to position %d of data \n", (uint8_t)sx1272.packet_received.data[a], a - 1);
 		}
@@ -152,7 +148,7 @@ std::string ReceivedPacket::generateJSON(){
 	}
 	json += buffer;
 	
-	/*for (int a = 0; a < pl; a++) {
+	for (int a = 0; a < pl; a++) {
 
 
 		if (a != pl - 1) {
@@ -172,7 +168,7 @@ std::string ReceivedPacket::generateJSON(){
 	if (debug) {
 		printf("%s \n", buffer);
 	}
-	json += buffer;*/
+	json += buffer;
 
 	return json;
 }
