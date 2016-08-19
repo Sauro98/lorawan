@@ -5762,20 +5762,20 @@ uint8_t SX1272::getACK(uint16_t wait)
                                 state = 0;
                                 //#if (SX1272_debug_mode > 0)
                                 // Printing the received ACK
-                                println(F("## ACK received:"));
-                                printf(F("Type: "));
+                                println("## ACK received:");
+                                printf("Type: ");
                                 println(ACK.type);			 	// Printing destination
-                                printf(F("Source: "));
+                                printf("Source: ");
                                 println(ACK.src);			 	// Printing source
-                                printf(F("ACK number: "));
+                                printf("ACK number: ");
                                 println(ACK.packnum);			// Printing ACK number
-                                printf(F("ACK fCtrl: "));
+                                printf("ACK fCtrl: ");
                                 println(ACK.fCtrl);				// Printing ACK fctrl
-								printf(F("ACK fPort: "));
+								printf("ACK fPort: ");
 								println(ACK.fPort);              // Printing ACK fport
-                                printf(F("ACK payload: "));
+                                printf("ACK payload: ");
                                 println(ACK.data[0]);			// Printing ACK payload
-                                printf(F("ACK SNR of rcv pkt at gw: "));
+                                printf("ACK SNR of rcv pkt at gw: ");
 
                                 value = ACK.data[1];
 
@@ -5792,7 +5792,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                                 }
 
                                 println(_rcv_snr_in_ack);
-                                println(F("##"));
+                                println("##");
                                 println();
                                 //#endif
                             }
@@ -5800,7 +5800,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                             {
                                 state = 1;
                                 //#if (SX1272_debug_mode > 0)
-                                println(F("** N-ACK received **"));
+                                println("** N-ACK received **");
                                 println();
                                 //#endif
                             }
@@ -5810,7 +5810,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                     {
                         state = 1;
                         //#if (SX1272_debug_mode > 0)
-                        println(F("** ACK number incorrectly received **"));
+                        println("** ACK number incorrectly received **");
                         println();
                         //#endif
                     }
@@ -5819,7 +5819,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                 {
                     state = 1;
                     //#if (SX1272_debug_mode > 0)
-                    println(F("** ACK source incorrectly received **"));
+                    println("** ACK source incorrectly received **");
                     println();
                     //#endif
                 }
@@ -5829,7 +5829,7 @@ uint8_t SX1272::getACK(uint16_t wait)
         {
             state = 1;
             //#if (SX1272_debug_mode > 0)
-            println(F("** ACK destination incorrectly received **"));
+            println("** ACK destination incorrectly received **");
             println();
             //#endif
         }
@@ -5838,7 +5838,7 @@ uint8_t SX1272::getACK(uint16_t wait)
     {
         state = 1;
         //#if (SX1272_debug_mode > 0)
-        println(F("** ACK lost **"));
+        println("** ACK lost **");
         println();
         //#endif
     }
