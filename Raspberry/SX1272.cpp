@@ -4171,7 +4171,8 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 				//IVANO
 				//this is actually the source now
-                _destination = 0;
+				printf("type : %04x \n",readRegister(REG_FIFO)); //type
+                _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) <<24;
             }
         }
         else
@@ -4225,7 +4226,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 
         // modified by Ivano
-        if (_destination == 0)
+        if (MID(_destination,25,32) == NETWORK_ID)
 
         { // LoRa or FSK mode
             forme = true;
@@ -4443,12 +4444,12 @@ int8_t SX1272::getPacket(uint16_t wait)
 			packet_received.fCtrl = readRegister(REG_FIFO); //fctrl
 			packet_received.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 ;	// packNum
             packet_received.fPort = readRegister(REG_FIFO);	// fPort
-			printf("type %04x \n", packet_received.type);//leave out the type
+			/*printf("type %04x \n", packet_received.type);//leave out the type
 			printf("src : %04x  \n", packet_received.src);
 			printf("netID : %04x \n", MID(packet_received.src,25,32));
 			printf("fctrl : %04x\n", packet_received.fCtrl);
 			printf("packnum : %04x \n", packet_received.packnum);
-			printf("fPort : %04x\n", packet_received.fPort);
+			printf("fPort : %04x\n", packet_received.fPort);*/
         }
         else {
             packet_received.type = 0;
