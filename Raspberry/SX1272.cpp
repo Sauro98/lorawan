@@ -3664,8 +3664,6 @@ uint8_t SX1272::setACK()
 		for (int a = 0; a < 4; a++) {
 
 			writeRegister(REG_FIFO, MID(ACK.src, (8 * a), (8 * (a + 1))));
-			printf("byte : MID( %d , %d ) ", (8 * a), (8 * (a + 1)));
-			printf("%x\n",MID(ACK.src, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
         writeRegister(REG_FIFO, ACK.fCtrl); //fCtrl
@@ -3673,8 +3671,6 @@ uint8_t SX1272::setACK()
 		printf("\n");
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(ACK.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
-			printf("byte : ");
-			printf("%x \n",MID(ACK.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, ACK.fPort);
@@ -4115,7 +4111,6 @@ boolean	SX1272::availableData(uint16_t wait)
     boolean forme = false;
     boolean	_hreceived = false;
     unsigned long previous;
-	printf("Inside avaiabledata\n");
 
 #if (SX1272_debug_mode > 0)
     printf("\n");
@@ -4141,7 +4136,6 @@ boolean	SX1272::availableData(uint16_t wait)
 #if (SX1272_debug_mode > 0)
             printf("## Valid Header received in LoRa mode ##\n");
 #endif
-			printf("## Valid Header received in LoRa mode ##\n");
             _hreceived = true;
 
 #ifdef W_NET_KEY
@@ -4171,7 +4165,6 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 				//IVANO
 				//this is actually the source now
-				printf("type : %04x \n",readRegister(REG_FIFO)); //type
                 _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) <<24;
             }
         }
@@ -4536,7 +4529,6 @@ int8_t SX1272::getPacket(uint16_t wait)
         Serial.println("");
 #endif
     }
-	delay(5000);
     return state;
 }
 
