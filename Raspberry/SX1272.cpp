@@ -3771,7 +3771,6 @@ uint8_t SX1272::receive()
         printf("\n");
 #endif
     }
-	printf("exiting receive with staus : %d \n", state);
     return state;
 }
 
@@ -4116,7 +4115,7 @@ boolean	SX1272::availableData(uint16_t wait)
     boolean forme = false;
     boolean	_hreceived = false;
     unsigned long previous;
-
+	printf("Inside avaiabledata");
 
 #if (SX1272_debug_mode > 0)
     printf("\n");
