@@ -12,7 +12,7 @@
 
 class ReceivedPacket{
 	public:
-		uint8_t data[6];
+		uint8_t data[244];
 	private:
 		uint8_t arduinoSenderID;
 		uint8_t sensorID;
