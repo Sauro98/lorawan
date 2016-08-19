@@ -4172,7 +4172,8 @@ boolean	SX1272::availableData(uint16_t wait)
 				//IVANO
 				//this is actually the source now
 				printf("type %04x \n",readRegister(REG_FIFO));//leave out the type
-                _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO)<<8 | readRegister(REG_FIFO)<<16 | readRegister(REG_FIFO)<<24;
+				printf("src : %04x %04x %04x %04x ", readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO));
+                _destination = 0;
             }
         }
         else
