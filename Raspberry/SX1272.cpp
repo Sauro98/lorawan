@@ -4534,7 +4534,7 @@ int8_t SX1272::getPacket(uint16_t wait)
         Serial.println("");
 #endif
     }
-
+	delay(5000);
     return state;
 }
 
