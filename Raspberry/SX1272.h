@@ -1307,7 +1307,7 @@ public:
 	//!
   	/*!
    	*/
-	uint8_t _destination;
+	uint32_t _destination;
 
 	//! Variable : packet number.
 	//!

@@ -4115,7 +4115,7 @@ boolean	SX1272::availableData(uint16_t wait)
     boolean forme = false;
     boolean	_hreceived = false;
     unsigned long previous;
-	printf("Inside avaiabledata");
+	printf("Inside avaiabledata\n");
 
 #if (SX1272_debug_mode > 0)
     printf("\n");
@@ -4135,16 +4135,13 @@ boolean	SX1272::availableData(uint16_t wait)
                 previous = millis();
             }
 
-			//Added by Ivano 17/08/2016 
-			//Il node mcu non riesce a stare ditro a questo while senza crashare perciò aggiungo un millisecondo di delay per farlo respirare
-			delay(1);
-
         } // end while (millis)
         if( bitRead(value, 4) == 1 )
         { // header received
 #if (SX1272_debug_mode > 0)
             printf("## Valid Header received in LoRa mode ##\n");
 #endif
+			printf("## Valid Header received in LoRa mode ##\n");
             _hreceived = true;
 
 #ifdef W_NET_KEY
@@ -4172,7 +4169,10 @@ boolean	SX1272::availableData(uint16_t wait)
                     _the_net_key_1 = readRegister(REG_FIFO);
                 }
 #endif
-                _destination = readRegister(REG_FIFO);
+				//IVANO
+				//this is actually the source now
+				readRegister(REG_FIFO)//leave out the type
+                _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO)<<8 | readRegister(REG_FIFO)<<16 | readRegister(REG_FIFO)<<24;
             }
         }
         else
@@ -4226,6 +4226,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 
         // modified by Ivano
+		pritnf("src : %x ",_destination);
         if (_destination << 25 == NETWORK_ID)
 
         { // LoRa or FSK mode
@@ -4254,6 +4255,8 @@ boolean	SX1272::availableData(uint16_t wait)
     //----else
     //	{
     //	}
+	////---------------------------DELETE THIS---------------------------------///
+	delay(5000);
     return forme;
 }
 
