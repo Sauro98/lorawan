@@ -389,6 +389,10 @@ struct pack
 	//porta arbitraria da 1 a 223, ho sceto 10
 	uint8_t fPort;
 
+	//Riaggiunta da Ivano 19/08/2016
+	//serve solo in ricezione
+	uint8_t length;
+
 };
 
 /******************************************************************************
