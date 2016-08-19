@@ -4460,7 +4460,7 @@ int8_t SX1272::getPacket(uint16_t wait)
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
 				printf("hex : %04x , dec : %d\n",packet_received.data[i], packet_received.data[i]);
             }
-
+			data[l] = '/0';
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);
 
