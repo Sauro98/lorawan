@@ -4369,7 +4369,7 @@ int8_t SX1272::getPacket(uint16_t wait)
         {
 #if (SX1272_debug_mode > 0)
             Serial.println(F("** The timeout has expired **"));
-            Serial.println();
+            Serial.println("");
 #endif
         }
         writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Setting standby FSK mode
@@ -4435,11 +4435,11 @@ int8_t SX1272::getPacket(uint16_t wait)
             {
                 printf((char)packet_received.data[i]);		// Printing payload
             }
-            Serial.println();
+            Serial.println("");
             //printf(F("Retry number: "));
             //Serial.println(packet_received.retry);			// Printing number retry
             Serial.println(F("##"));
-            Serial.println();
+            Serial.println("");
 #endif
             state = 0;
 
@@ -4466,7 +4466,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             //_retries++;
 #if (SX1272_debug_mode > 0)
             Serial.println(F("## Retrying to send the last packet ##"));
-            Serial.println();
+            Serial.println("");
 #endif
         }
     }
@@ -4480,7 +4480,7 @@ int8_t SX1272::getPacket(uint16_t wait)
         state = -1;
 #if (SX1272_debug_mode > 0)
         Serial.println(F("** The timeout must be smaller than 12.5 seconds **"));
-        Serial.println();
+        Serial.println("");
 #endif
     }
 
@@ -4942,7 +4942,7 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 
 
 #if (SX1272_debug_mode > 1)
-    Serial.println();
+    Serial.println("");
     Serial.println(F("Starting 'setPacket'"));
 #endif
 
@@ -5035,7 +5035,7 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
         {
             printf((char)packet_sent.data[i]);		// Printing payload
         }
-        Serial.println();
+        Serial.println("");
         //printf(F("Retry number: "));
         //Serial.println(packet_sent.retry);			// Printing retry number
         Serial.println(F("##"));*/
@@ -5061,7 +5061,7 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 	packet_sent.packnum = _packetNumber;
 
 #if (SX1272_debug_mode > 1)
-	Serial.println();
+	Serial.println("");
 	Serial.println(F("Starting 'setPacket'"));
 #endif
 
@@ -5150,7 +5150,7 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 		{
 		printf((char)packet_sent.data[i]);		// Printing payload
 		}
-		Serial.println();
+		Serial.println("");
 		//printf(F("Retry number: "));
 		//Serial.println(packet_sent.retry);			// Printing retry number
 		Serial.println(F("##"));
@@ -5793,7 +5793,7 @@ uint8_t SX1272::getACK(uint16_t wait)
 
                                 Serial.println(_rcv_snr_in_ack);
                                 Serial.println("##");
-                                Serial.println();
+                                Serial.println("");
                                 //#endif
                             }
                             else
@@ -5801,7 +5801,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                                 state = 1;
                                 //#if (SX1272_debug_mode > 0)
                                 Serial.println("** N-ACK received **");
-                                Serial.println();
+                                Serial.println("");
                                 //#endif
                             }
                         
@@ -5811,7 +5811,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                         state = 1;
                         //#if (SX1272_debug_mode > 0)
                         Serial.println("** ACK number incorrectly received **");
-                        Serial.println();
+                        Serial.println("");
                         //#endif
                     }
                 }
@@ -5820,7 +5820,7 @@ uint8_t SX1272::getACK(uint16_t wait)
                     state = 1;
                     //#if (SX1272_debug_mode > 0)
                     Serial.println("** ACK source incorrectly received **");
-                    Serial.println();
+                    Serial.println("");
                     //#endif
                 }
             }
@@ -5830,7 +5830,7 @@ uint8_t SX1272::getACK(uint16_t wait)
             state = 1;
             //#if (SX1272_debug_mode > 0)
             Serial.println("** ACK destination incorrectly received **");
-            Serial.println();
+            Serial.println("");
             //#endif
         }
     }
@@ -5839,7 +5839,7 @@ uint8_t SX1272::getACK(uint16_t wait)
         state = 1;
         //#if (SX1272_debug_mode > 0)
         Serial.println("** ACK lost **");
-        Serial.println();
+        Serial.println("");
         //#endif
     }
     clearFlags();	// Initializing flags
