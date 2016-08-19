@@ -3822,6 +3822,7 @@ uint8_t SX1272::receivePacketTimeout(uint16_t wait)
     {
         if( availableData(wait) )
         {
+			printf("packet received\n");
             state = getPacket();
         }
         else
