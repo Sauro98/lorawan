@@ -42,7 +42,7 @@ arduPi_pi2.o: arduPi_pi2.cpp arduPi_pi2.h
 	g++ -c arduPi_pi2.cpp -o arduPi_pi2.o	
 
 SX1272.o: SX1272.cpp SX1272.h
-	g++ -c SX1272.cpp SX1272.h -o SX1272.o
+	g++ -c SX1272.cpp -o SX1272.o
 
 SX1272_pi2.o: SX1272.cpp SX1272.h
 	g++ -DRASPBERRY2 -c SX1272.cpp -o SX1272_pi2.o
