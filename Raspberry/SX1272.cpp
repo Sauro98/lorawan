@@ -4412,7 +4412,7 @@ int8_t SX1272::getPacket(uint16_t wait)
 				//Test to be removed in days
 				printf(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
-				printf(packet_received.data[i]);
+				printf("%d\n",packet_received.data[i]);
             }
 
             // commented by C. Pham
