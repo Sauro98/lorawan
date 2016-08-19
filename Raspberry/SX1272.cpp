@@ -3715,7 +3715,6 @@ uint8_t SX1272::receive()
     printf("\n");
     printf("Starting 'receive'\n");
 #endif
-	printf("Starting 'receive'\n");
     // Initializing packet_received struct
     memset( &packet_received, 0x00, sizeof(packet_received) );
 
