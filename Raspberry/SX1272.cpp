@@ -3636,7 +3636,7 @@ uint8_t SX1272::setACK()
     }
 
     // Setting ACK length in order to send it
-    state = setPacketLength(ACK_LENGTH);
+    state = 0;
     if( state == 0 )
     {
         // Setting ACK
@@ -3754,7 +3754,7 @@ uint8_t SX1272::receive()
     //state = 1;
     if( _modem == LORA )
     { // LoRa mode
-        state = setPacketLength(MAX_LENGTH);	// With MAX_LENGTH gets all packets with length < MAX_LENGTH
+        state = 0;	// With MAX_LENGTH gets all packets with length < MAX_LENGTH
         writeRegister(REG_OP_MODE, LORA_RX_MODE);  	  // LORA mode - Rx
 #if (SX1272_debug_mode > 1)
         printf("## Receiving LoRa mode activated with success ##\n");
@@ -3763,7 +3763,7 @@ uint8_t SX1272::receive()
     }
     else
     { // FSK mode
-        state = setPacketLength();
+        state = 0;
         writeRegister(REG_OP_MODE, FSK_RX_MODE);  // FSK mode - Rx
 #if (SX1272_debug_mode > 1)
         printf("## Receiving FSK mode activated with success ##\n");
@@ -4888,7 +4888,7 @@ uint8_t SX1272::setPayload(char *payload)
 #endif
     }
     // set length with the actual counter value
-    state_f = setPacketLength();	// Setting packet length in packet structure
+    state_f = 0;	// Setting packet length in packet structure
     return state_f;
 }
 
@@ -4923,7 +4923,7 @@ uint8_t SX1272::setPayload(uint8_t *payload)
         packet_sent.data[i] = payload[i];	// Storing payload in packet structure
     }
     // set length with the actual counter value
-    state = setPacketLength();	// Setting packet length in packet structure
+    state = 0;	// Setting packet length in packet structure
     return state;
 }
 
