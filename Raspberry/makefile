@@ -33,8 +33,6 @@ lora_gateway_winput.o: lora_gateway.cpp
 lora_gateway_pi2_winput.o: lora_gateway.cpp
 	g++ $(CFLAGS) -DRASPBERRY -DRASPBERRY2 -DIS_RCV_GATEWAY -DWINPUT -c lora_gateway.cpp -o lora_gateway_pi2_winput.o
 
-ReceivedPacketsHandler.o: ReceivedPacketsHandler.cpp ReceivedPacketsHandler.h
-	g++ -c ReceivedPacketsHandler.cpp -o ReceivedPacketsHandler.o
 
 arduPi.o: arduPi.cpp arduPi.h
 	g++ -c arduPi.cpp -o arduPi.o	
