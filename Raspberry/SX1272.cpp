@@ -4946,30 +4946,29 @@ uint8_t SX1272::setPayload(char *payload)
 */
 uint8_t SX1272::setPayload(uint8_t *payload)
 {
-    uint8_t state = 2;
+	uint8_t state = 2;
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'setPayload'\n");
+	Serial.println("");
+	Serial.println("Starting 'setPayload'");
 #endif
 
-    state = 1;
-    if( ( _modem == FSK ) && ( _payloadlength > MAX_PAYLOAD_FSK ) )
-    {
-        _payloadlength = MAX_PAYLOAD_FSK;
-        state = 1;
+	state = 1;
+	if ((_modem == FSK) && (_payloadlength > MAX_PAYLOAD_FSK))
+	{
+		_payloadlength = MAX_PAYLOAD_FSK;
+		state = 1;
 #if (SX1272_debug_mode > 1)
-        printf("In FSK, payload length must be less than 60 bytes.\n");
-        printf("\n");
+		//Serial.println(F("In FSK, payload length must be less than 60 bytes."));
+		//Serial.println();
 #endif
-    }
-    for(unsigned int i = 0; i < _payloadlength; i++)
-    {
-        packet_sent.data[i] = payload[i];	// Storing payload in packet structure
-    }
-    // set length with the actual counter value
-    state = 0;	// Setting packet length in packet structure
-    return state;
+	}
+	for (unsigned int i = 0; i < _payloadlength; i++)
+	{
+		packet_sent.data[i] = payload[i];	// Storing payload in packet structure
+	}
+	// set length with the actual counter value
+	return state;
 }
 
 /*
