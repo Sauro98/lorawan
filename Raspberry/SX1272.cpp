@@ -4103,15 +4103,6 @@ boolean	SX1272::availableData()
    wait: time to wait while there is no a valid header received.
 */
 
-//**********************************************************************/
-// Added by Ivano
-//**********************************************************************/
-
-void SX1272::setPacketFctrl(uint8_t type)
-{
-	packet_sent.fCtrl = type;
-
-}
 
 
 
@@ -5160,11 +5151,7 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 	return state;
 }
 
-//Added by Ivano 19/08/2016 set packet type
 
-void SX1272::setType(uint8_t type) {
-	packet_sent.type = type;
-}
 
 /*
  Function: Configures the module to transmit information.
@@ -5676,6 +5663,14 @@ uint8_t SX1272::getACK()
  Parameters:
    wait: time to wait while there is no a valid header received.
 */
+
+//Added by Ivano 19/08/2016 set packet type
+
+void SX1272::setType(uint8_t type) {
+	packet_sent.type = type;
+}
+
+
 //Modificato da Ivano 18/08/2016
 uint8_t SX1272::getACK(uint16_t wait)
 {
@@ -5845,14 +5840,15 @@ uint8_t SX1272::getACK(uint16_t wait)
     clearFlags();	// Initializing flags
     return state;
 }
-/*
- Function: Configures the module to transmit information with retries in case of error.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
 
-//Send with retries deleted by Ivano 18/08/2016
+//**********************************************************************/
+// Added by Ivano
+//**********************************************************************/
+
+void SX1272::setPacketFctrl(uint8_t type)
+{
+	packet_sent.fCtrl = type;
+
+}
 
 SX1272 sx1272 = SX1272();
