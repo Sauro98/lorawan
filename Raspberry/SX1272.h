@@ -31,7 +31,6 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <Arduino.h>
 #include <SPI.h>
 
 #pragma region define_region
