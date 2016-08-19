@@ -346,7 +346,7 @@ const uint8_t INCORRECT_PACKET = 1;
 #define PKT_TYPE_NO_ACK 0x40
 
 #define NETWORK_ID 0x4D
-#define NETWORK_ADDRESS 0xB
+#define NETWORK_ADDRESS 0xF
 
 #define F_PORT 10
 //
