@@ -314,11 +314,11 @@ const uint8_t LORA = 1;
 const uint8_t FSK = 0;
 const uint8_t BROADCAST_0 = 0x00;
 const uint8_t MAX_LENGTH = 255;
-const uint8_t MAX_PAYLOAD = 244;
+const uint8_t MAX_PAYLOAD = 251;
 const uint8_t MAX_LENGTH_FSK = 64;
 const uint8_t MAX_PAYLOAD_FSK = 60;
-//Modified by Ivano 18/08/2016 this is not the way we recognize ack anymore
-const uint8_t ACK_LENGTH = 2;
+//modified by C. Pham, 7 instead of 5 because we added a type field which should be PKT_TYPE_ACK and the SNR
+const uint8_t ACK_LENGTH = 7;
 // added by C. Pham
 #ifdef W_NET_KEY
 const uint8_t NET_KEY_LENGTH=2;
@@ -341,18 +341,16 @@ const uint8_t INCORRECT_PACKET = 1;
 // added by C. Pham
 // Packet type definition
 
-//Added by Ivano 18/08/2016
-#define PKT_FCTRL_DATA 0x00
-#define PKT_FCTRL_ACK 0x20
+#define PKT_TYPE_MASK   0xF0
+#define PKT_FLAG_MASK   0x0F
 
-#define PKT_TYPE_REQUEST_ACK 0x80
-#define PKT_TYPE_NO_ACK 0x40
+#define PKT_TYPE_DATA   0x10
+#define PKT_TYPE_ACK    0x20
 
-#define NETWORK_ID 0x4D
-#define NETWORK_ADDRESS 0xF
-
-#define F_PORT 10
-//
+#define PKT_FLAG_ACK_REQ            0x08
+#define PKT_FLAG_DATA_ENCRYPTED     0x04
+#define PKT_FLAG_DATA_WAPPKEY       0x02
+#define PKT_FLAG_DATA_ISBINARY      0x01
 
 //! Structure :
 /*!
@@ -363,34 +361,45 @@ struct pack
 #ifdef W_NET_KEY
         uint8_t netkey[NET_KEY_LENGTH];
 #endif
+	//! Structure Variable : Packet destination
+	/*!
+ 	*/
+	uint8_t dst;
 
-   //Aggiunta da Ivano 18/08/2016
-	// type 01000000 - 0x40 non richiedere ack
-	// type 10000000 - 0x80 richiedi ack
+    // added by C. Pham
+    //! Structure Variable : Packet type
+    /*!
+    */
     uint8_t type;
 
-	//Aggiunta da Ivano 18/08/2016
-	// I primi sette bit identificano il network, mentre i sucessivi 25 identificano il dispositivo
-	uint32_t src;
+	//! Structure Variable : Packet source
+	/*!
+ 	*/
+	uint8_t src;
 
-	//Aggiunta da Ivano 18/08/2016
-	// due byte di contatore di pacchetto
-	uint16_t packnum;
+	//! Structure Variable : Packet number
+	/*!
+ 	*/
+	uint8_t packnum;
 
+    // modified by C. Pham
+    // will not be used in the transmitted packet
+	//! Structure Variable : Packet length
+	/*!
+ 	*/
+	uint8_t length;
 
 	//! Structure Variable : Packet payload
 	/*!
  	*/
 	uint8_t data[MAX_PAYLOAD];
 
-    //Aggiunta da Ivano 18/08/2016
-	// fCtrl 00000000 - 0x00 messaggio contenete dati
-	// fCtrl 00100000 - 0x20 messaggio ack 
-	uint8_t fCtrl;
-
-	//Aggiunta da Ivano 18/08/2016
-	//porta arbitraria da 1 a 223, ho sceto 10
-	uint8_t fPort;
+    // modified by C. Pham
+    // will not be used in the transmitted packet
+	//! Structure Variable : Retry number
+	/*!
+ 	*/
+	uint8_t retry;
 };
 
 /******************************************************************************
@@ -444,8 +453,7 @@ public:
         _my_netkey[1] = net_key_1;
 #endif
 		_maxRetries = 3;
-		//Commentato da ivano 18/08/2016
-    	//packet_sent.retry = _retries;
+		packet_sent.retry = _retries;
 	};
 
 	//! It puts the module ON
@@ -869,12 +877,6 @@ public:
   	 *
 	\return '0' on success, '1' otherwise
 	 */
-	 
-	 
-	//Added by Ivano 19/08/2016
-
-	void setType(uint8_t type);
-	 
 	uint8_t receiveAll();
 
 	//! It puts the module in 'promiscuous' reception mode with a timeout.
@@ -983,9 +985,6 @@ public:
 	\return '0' on success, '1' otherwise
 	*/
 	uint8_t sendPacketTimeout(uint8_t dest, char *payload);
-
-	//Added by Ivano 19/08/2016
-	void setPacketFctrl(uint8_t type);
 
 	//! It sends the packet wich payload is a parameter before ending MAX_TIMEOUT.
 	/*!

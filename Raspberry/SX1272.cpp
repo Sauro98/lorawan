@@ -2476,16 +2476,6 @@ boolean	SX1272::isChannel(uint32_t ch)
 #endif
 }
 
-//**********************************************************************/
-// Added by Ivano
-//**********************************************************************/
-
-void SX1272::setPacketFctrl(uint8_t type)
-{
-	packet_sent.fCtrl = type;
-
-}
-
 /*
  Function: Indicates the frequency channel within the module is configured.
  Returns: Integer that determines if there has been any error
@@ -3007,23 +2997,7 @@ uint8_t SX1272::getPayloadLength()
     return state;
 }
 
-/*
- Function: Sets the packet length in the module.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-   state = -1 --> Forbidden command for this protocol
-*/
-int8_t SX1272::setPacketLength()
-{
-    uint16_t length;
-
-    length = _payloadlength + OFFSET_PAYLOADLENGTH;
-    return setPacketLength(length);
-}
-
-//SetPacketLenght removed by Ivano 19/08/2016
+//SetPacketLenght() deleted by Ivano 18/08/2016
 
 /*
  Function: Gets the node address in the module.
@@ -3630,6 +3604,10 @@ uint8_t SX1272::truncPayload(uint16_t length16)
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
+
+//Modificata da Ivano 18/08/2016
+
+
 uint8_t SX1272::setACK()
 {
     uint8_t state = 2;
@@ -3657,27 +3635,44 @@ uint8_t SX1272::setACK()
     if( state == 0 )
     {
         // Setting ACK
-        ACK.dst = packet_received.src; // ACK destination is packet source
-        ACK.type = PKT_TYPE_ACK;
-        ACK.src = packet_received.dst; // ACK source is packet destination
+        // Commented by Ivano 18/08/2016 dst deprecated -> ACK.dst = packet_received.src; // ACK destination is packet source
+		// FCTRL TYPE ACK
+		ACK.fCtrl = PKT_FCTRL_ACK;
+        ACK.type = PKT_TYPE_NO_ACK;
+		//Modificato da Ivano 18/08/2016 ora il dst è a 32 bit
+        ACK.src = NETWORK_ADDRESS <<25 | NETWORK_ID; // ACK source is packet destination
+		ACK.fPort = F_PORT;
         ACK.packnum = packet_received.packnum; // packet number that has been correctly received
-        ACK.length = 2;
         ACK.data[0] = _reception;	// CRC of the received packet
         // added by C. Pham
         // store the SNR
         ACK.data[1]= readRegister(REG_PKT_SNR_VALUE);
-
         // Setting address pointer in FIFO data buffer
         writeRegister(REG_FIFO_ADDR_PTR, 0x80);
 
         state = 1;
 
-        // Writing ACK to send in FIFO
-        writeRegister(REG_FIFO, ACK.dst); 		// Writing the destination in FIFO
-        writeRegister(REG_FIFO, ACK.type);
-        writeRegister(REG_FIFO, ACK.src);		// Writing the source in FIFO
-        writeRegister(REG_FIFO, ACK.packnum);	// Writing the packet number in FIFO
-        writeRegister(REG_FIFO, ACK.length); 	// Writing the packet length in FIFO
+        // Writing ACK to send in FIFO Modificato da Ivano 18/08/2016
+        writeRegister(REG_FIFO, ACK.type); 		// tipo
+
+		for (int a = 0; a < 4; a++) {
+
+			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
+			printf("byte : MID( %d , %d ) ", (8 * a), (8 * (a + 1)));
+			Serial.println(MID(packet_sent.src, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+		}
+
+        writeRegister(REG_FIFO, ACK.fCtrl); //fCtrl
+
+		printf("\n");
+		for (int a = 0; a < 2; a++) {
+			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
+			Serial.print("byte : ");
+			Serial.println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+		}
+
+		writeRegister(REG_FIFO, ACK.fPort);
+
         writeRegister(REG_FIFO, ACK.data[0]);	// Writing the ACK in FIFO
         writeRegister(REG_FIFO, ACK.data[1]);	// Writing the ACK in FIFO
 
@@ -4110,9 +4105,23 @@ boolean	SX1272::availableData()
  Parameters:
    wait: time to wait while there is no a valid header received.
 */
+
+//**********************************************************************/
+// Added by Ivano
+//**********************************************************************/
+
+void SX1272::setPacketFctrl(uint8_t type)
+{
+	packet_sent.fCtrl = type;
+
+}
+
+
+
+//Modified by Ivano 18/08/2016
 boolean	SX1272::availableData(uint16_t wait)
 {
-    byte value;
+        byte value;
     byte header = 0;
     boolean forme = false;
     boolean	_hreceived = false;
@@ -4120,8 +4129,7 @@ boolean	SX1272::availableData(uint16_t wait)
 
 
 #if (SX1272_debug_mode > 0)
-    printf("\n");
-    printf("Starting 'availableData'\n");
+    Serial.println();
 #endif
 
     previous = millis();
@@ -4137,13 +4145,19 @@ boolean	SX1272::availableData(uint16_t wait)
             {
                 previous = millis();
             }
+
+			//Added by Ivano 17/08/2016 
+			//Il node mcu non riesce a stare ditro a questo while senza crashare perciò aggiungo un millisecondo di delay per farlo respirare
+			delay(1);
+
         } // end while (millis)
         if( bitRead(value, 4) == 1 )
         { // header received
 #if (SX1272_debug_mode > 0)
-            printf("## Valid Header received in LoRa mode ##\n");
+            Serial.println(F("## Valid Header received in LoRa mode ##"));
 #endif
             _hreceived = true;
+
 #ifdef W_NET_KEY
             // actually, need to wait until 3 bytes have been received
             while( (header < 3) && (millis() - previous < (unsigned long)wait) )
@@ -4158,9 +4172,11 @@ boolean	SX1272::availableData(uint16_t wait)
                     previous = millis();
                 }
             }
+
             if( header != 0 )
             { // Reading first byte of the received packet
 #ifdef W_NET_KEY
+                // added by C. Pham
                 // if we actually wait for an ACK, there is no net key before ACK data
                 if (_requestACK==0) {
                     _the_net_key_0 = readRegister(REG_FIFO);
@@ -4175,8 +4191,8 @@ boolean	SX1272::availableData(uint16_t wait)
             forme = false;
             _hreceived = false;
 #if (SX1272_debug_mode > 0)
-            printf("** The timeout has expired **\n");
-            printf("\n");
+            Serial.println(F("** The timeout has expired **"));
+            Serial.println();
 #endif
         }
     }
@@ -4197,7 +4213,7 @@ boolean	SX1272::availableData(uint16_t wait)
         {
             _hreceived = true;
 #if (SX1272_debug_mode > 0)
-            printf("## Valid Preamble detected in FSK mode ##\n");
+            Serial.println(F("## Valid Preamble detected in FSK mode ##"));
 #endif
             // Reading first byte of the received packet
             _destination = readRegister(REG_FIFO);
@@ -4207,56 +4223,34 @@ boolean	SX1272::availableData(uint16_t wait)
             forme = false;
             _hreceived = false;
 #if (SX1272_debug_mode > 0)
-            printf("** The timeout has expired **\n");
-            printf("\n");
+            Serial.println(F("** The timeout has expired **"));
+            Serial.println();
 #endif
         }
     }
     // We use _hreceived because we need to ensure that _destination value is correctly
     // updated and is not the _destination value from the previously packet
-    if( _hreceived )
+    if( _hreceived == true )
     { // Checking destination
 #if (SX1272_debug_mode > 0)
-        printf("## Checking destination ##\n");
+        Serial.println(F("## Checking destination ##"));
 #endif
 
-        // added by C. Pham
-#ifdef W_NET_KEY
-        forme=true;
+        // modified by Ivano
+        if (_destination << 25 == NETWORK_ID)
 
-        // if we wait for an ACK, then we do not check for net key
-        if (_requestACK==0)
-            if (_the_net_key_0!=_my_netkey[0] || _the_net_key_1!=_my_netkey[1]) {
-                //#if (SX1272_debug_mode > 0)
-                printf("## Wrong net key ##\n");
-                //#endif
-                forme=false;
-            }
-            else
-            {
-                //#if (SX1272_debug_mode > 0)
-                printf("## Good net key ##\n");
-                //#endif
-            }
-
-        if( forme && ((_destination == _nodeAddress) || (_destination == BROADCAST_0)) )
-#else
-        // modified by C. Pham
-        // if _rawFormat, accept all
-        if( (_destination == _nodeAddress) || (_destination == BROADCAST_0) || _rawFormat)
-#endif
         { // LoRa or FSK mode
             forme = true;
 #if (SX1272_debug_mode > 0)
-            printf("## Packet received is for me ##\n");
+            Serial.println(F("## Packet received is for me ##"));
 #endif
         }
         else
         {
             forme = false;
 #if (SX1272_debug_mode > 0)
-            printf("## Packet received is not for me ##\n");
-            printf("\n");
+            Serial.println(F("## Packet received is not for me ##"));
+            Serial.println();
 #endif
             if( _modem == LORA )	// STANDBY PARA MINIMIZAR EL CONSUMO
             { // LoRa mode
@@ -4293,22 +4287,6 @@ uint8_t SX1272::getPacketMAXTimeout()
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
-int8_t SX1272::getPacket()
-{
-    return getPacket(MAX_TIMEOUT);
-}
-
-/*
- Function: It gets and stores a packet if it is received before ending 'wait' time.
- Returns:  Integer that determines if there has been any error
-   state = 3  --> The command has been executed but packet has been incorrectly received
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-   state = -1 --> Forbidden parameter value for this function
- Parameters:
-   wait: time to wait while there is no a valid header received.
-*/
 int8_t SX1272::getPacket(uint16_t wait)
 {
     uint8_t state = 2;
@@ -4317,8 +4295,8 @@ int8_t SX1272::getPacket(uint16_t wait)
     boolean p_received = false;
 
 #if (SX1272_debug_mode > 0)
-    printf("\n");
-    printf("Starting 'getPacket'\n");
+    Serial.println();
+    Serial.println(F("Starting 'getPacket'"));
 #endif
 
     previous = millis();
@@ -4341,7 +4319,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             p_received = true;	// packet correctly received
             _reception = CORRECT_PACKET;
 #if (SX1272_debug_mode > 0)
-            printf("## Packet correctly received in LoRa mode ##\n");
+            Serial.println(F("## Packet correctly received in LoRa mode ##"));
 #endif
         }
         else
@@ -4351,12 +4329,12 @@ int8_t SX1272::getPacket(uint16_t wait)
                 _reception = INCORRECT_PACKET;
                 state = 3;
 #if (SX1272_debug_mode > 0)
-                printf("** The CRC is incorrect **\n");
-                printf("\n");
+                Serial.println(F("** The CRC is incorrect **"));
+                Serial.println();
 #endif
             }
         }
-        writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Setting standby LoRa mode
+        //writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Setting standby LoRa mode
     }
     else
     { // FSK mode
@@ -4377,7 +4355,7 @@ int8_t SX1272::getPacket(uint16_t wait)
                 _reception = CORRECT_PACKET;
                 p_received = true;
 #if (SX1272_debug_mode > 0)
-                printf("## Packet correctly received in FSK mode ##\n");
+                Serial.println(F("## Packet correctly received in FSK mode ##"));
 #endif
             }
             else
@@ -4386,57 +4364,42 @@ int8_t SX1272::getPacket(uint16_t wait)
                 state = 3;
                 p_received = false;
 #if (SX1272_debug_mode > 0)
-                printf("## Packet incorrectly received in FSK mode ##\n");
+                Serial.println(F("## Packet incorrectly received in FSK mode ##"));
 #endif
             }
         }
         else
         {
 #if (SX1272_debug_mode > 0)
-            printf("** The timeout has expired **\n");
-            printf("\n");
+            Serial.println(F("** The timeout has expired **"));
+            Serial.println();
 #endif
         }
         writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Setting standby FSK mode
     }
-    if( p_received )
+    if( p_received == true )
     {
         // Store the packet
         if( _modem == LORA )
         {
             // comment by C. Pham
-            // set the FIFO addr to 0 to read again the destination
+            // set the FIFO addr to 0 to read again all the bytes
             writeRegister(REG_FIFO_ADDR_PTR, 0x00);  	// Setting address pointer in FIFO data buffer
+
 #ifdef W_NET_KEY
             // added by C. Pham
             packet_received.netkey[0]=readRegister(REG_FIFO);
             packet_received.netkey[1]=readRegister(REG_FIFO);
 #endif
-            //modified by C. Pham
-            if (!_rawFormat)
-                packet_received.dst = readRegister(REG_FIFO);	// Storing first byte of the received packet
-            else
-                packet_received.dst = 0;
+            
         }
-        else
-        {
-            value = readRegister(REG_PACKET_CONFIG1);
-            if( (bitRead(value, 2) == 0) && (bitRead(value, 1) == 0) )
-            {
-                packet_received.dst = readRegister(REG_FIFO); // Storing first byte of the received packet
-            }
-            else
-            {
-                packet_received.dst = _destination;			// Storing first byte of the received packet
-            }
-        }
-
         // modified by C. Pham
         if (!_rawFormat) {
-            packet_received.type = readRegister(REG_FIFO);		// Reading second byte of the received packet
-            packet_received.src = readRegister(REG_FIFO);		// Reading second byte of the received packet
-            packet_received.packnum = readRegister(REG_FIFO);	// Reading third byte of the received packet
-            //packet_received.length = readRegister(REG_FIFO);	// Reading fourth byte of the received packet
+            packet_received.type = readRegister(REG_FIFO);		// tipo
+            packet_received.src = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) << 24;		// Src
+			packet_received.fCtrl = readRegister(REG_FIFO); //fctrl
+			packet_received.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 ;	// packNum
+            packet_received.fPort = readRegister(REG_FIFO);	// fPort
         }
         else {
             packet_received.type = 0;
@@ -4444,79 +4407,69 @@ int8_t SX1272::getPacket(uint16_t wait)
             packet_received.packnum = 0;
         }
 
-        packet_received.length = readRegister(REG_RX_NB_BYTES);
+        //Commentato da Ivano 18/08/2016 lenght non esiste più - > packet_received.length = readRegister(REG_RX_NB_BYTES);
 
-        if( _modem == LORA )
-        {
-            if (_rawFormat) {
-                _payloadlength=packet_received.length;
-            }
-            else
-                _payloadlength = packet_received.length - OFFSET_PAYLOADLENGTH;
-        }
-        if( packet_received.length > (MAX_LENGTH + 1) )
-        {
-#if (SX1272_debug_mode > 0)
-            printf("Corrupted packet, length must be less than 256\n");
-#endif
-        }
-        else
-        {
-            for(unsigned int i = 0; i < _payloadlength; i++)
+            for(unsigned int i = 0; i < 200; i++)
             {
+				//Added by Ivano 18/08/2016
+				//Test to be removed in days
+				Serial.print(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
+				Serial.print(packet_received.data[i]);
             }
 
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);
 
             // Print the packet if debug_mode
-                 
-            
 #if (SX1272_debug_mode > 0)
-            printf("## Packet received:\n");
-            printf("Destination: ");
-            printf("%d\n", packet_received.dst);			 	// Printing destination
-            printf("Source: ");
-            printf("%d\n", packet_received.src);			 	// Printing source
-            printf("Packet number: ");
-            printf("%d\n", packet_received.packnum);			// Printing packet number
-            printf("Packet length: ");
-            printf("%d\n", packet_received.length);			// Printing packet length
-            printf("Data: ");
+            Serial.println(F("## Packet received:"));
+            Serial.print(F("Destination: "));		
+            Serial.print(F("Type: "));
+            Serial.println(packet_received.type);			 	// Printing source
+            Serial.print(F("Source: "));
+            Serial.println(packet_received.src);			 	// Printing source
+            Serial.print(F("Packet number: "));
+            Serial.println(packet_received.packnum);			// Printing packet number
+            //Serial.print(F("Packet length: "));
+            //Serial.println(packet_received.length);			// Printing packet length
+            Serial.print(F("Data: "));
             for(unsigned int i = 0; i < _payloadlength; i++)
             {
-                printf("%c", packet_received.data[i]);		// Printing payload
+                Serial.print((char)packet_received.data[i]);		// Printing payload
             }
-            printf("\n");
-            printf("Retry number: ");
-            printf("%d\n", packet_received.retry);			// Printing number retry
-            printf(" ##\n");
-            printf("\n");
+            Serial.println();
+            //Serial.print(F("Retry number: "));
+            //Serial.println(packet_received.retry);			// Printing number retry
+            Serial.println(F("##"));
+            Serial.println();
 #endif
             state = 0;
 
 #ifdef W_REQUESTED_ACK
             // added by C. Pham
             // need to send an ACK
-            if (packet_received.type & PKT_FLAG_ACK_REQ) {
+            if (packet_received.type & PKT_TYPE_REQUEST_ACK) {
                 state = 5;
                 _requestACK_indicator=1;
             }
             else
                 _requestACK_indicator=0;
 #endif
-        }
+        
     }
     else
     {
         state = 1;
         if( (_reception == INCORRECT_PACKET) && (_retries < _maxRetries) )
         {
-            _retries++;
+            // comment by C. Pham
+            // what is the purpose of incrementing retries here?
+            // bug? not needed?
+            //_retries++;
 #if (SX1272_debug_mode > 0)
-            printf("## Retrying to send the last packet ##\n");
-            printf("\n");
+            Serial.println(F("## Retrying to send the last packet ##"));
+            Serial.println();
 #endif
         }
     }
@@ -4529,8 +4482,8 @@ int8_t SX1272::getPacket(uint16_t wait)
     {
         state = -1;
 #if (SX1272_debug_mode > 0)
-        printf("** The timeout must be smaller than 12.5 seconds **\n");
-        printf("\n");
+        Serial.println(F("** The timeout must be smaller than 12.5 seconds **"));
+        Serial.println();
 #endif
     }
 
@@ -4546,37 +4499,7 @@ int8_t SX1272::getPacket(uint16_t wait)
  Parameters:
    dest: destination value of the packet sent.
 */
-int8_t SX1272::setDestination(uint8_t dest)
-{
-    int8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'setDestination'\n");
-#endif
-
-    state = 1;
-    _destination = dest; // Storing destination in a global variable
-    packet_sent.dst = dest;	 // Setting destination in packet structure
-    packet_sent.src = _nodeAddress; // Setting source in packet structure
-    packet_sent.packnum = _packetNumber;	// Setting packet number in packet structure
-    _packetNumber++;
-    state = 0;
-
-#if (SX1272_debug_mode > 1)
-    printf("## Destination ");
-    printf("%X", _destination);
-    printf(" successfully set ##\n");
-    printf("## Source ");
-    printf("%d", packet_sent.src);
-    printf(" successfully set ##\n");
-    printf("## Packet number ");
-    printf("%d", packet_sent.packnum);
-    printf(" successfully set ##\n");
-    printf("\n");
-#endif
-    return state;
-}
+//Set destination deleted by Ivano 18/08/2016
 
 /*
  Function: It sets the timeout according to the configured mode.
@@ -5014,14 +4937,16 @@ uint8_t SX1272::setPayload(uint8_t *payload)
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
+//Modificata da Ivano 18/08/2016
 uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 {
+	packet_sent.src = NETWORK_ID << 25| NETWORK_ADDRESS;
     int8_t state = 2;
 
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'setPacket'\n");
+    Serial.println();
+    Serial.println(F("Starting 'setPacket'"));
 #endif
 
     clearFlags();	// Initializing flags
@@ -5036,40 +4961,24 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
     }
 
     _reception = CORRECT_PACKET;	// Updating incorrect value
-    if( _retries == 0 )
-    { // Updating this values only if is not going to re-send the last packet
-        state = setDestination(dest);	// Setting destination in packet structure
-        if( state == 0 )
-        {
-            state = setPayload(payload);
-        }
-    }
-    else
-    {
-        if( _retries == 1 )
-        {
-            packet_sent.length++;
-        }
-        state = setPacketLength();
-        packet_sent.retry = _retries;
+  
 #if (SX1272_debug_mode > 0)
-        printf("** Retrying to send last packet ");
-        printf("%d", _retries);
-        printf(" time **\n");
+       /* Serial.print(F("** Retrying to send last packet "));
+        Serial.print(_retries, DEC);
+        Serial.println(F(" time **"));*/
 #endif
-    }
+    
 
     // added by C. Pham
     // set the type to be a data packet
-    packet_sent.type |= PKT_TYPE_DATA;
+    packet_sent.fCtrl = PKT_FCTRL_DATA;
 
 #ifdef W_REQUESTED_ACK
     // added by C. Pham
     // indicate that an ACK should be sent by the receiver
     if (_requestACK)
-        packet_sent.type |= PKT_FLAG_ACK_REQ;
+        packet_sent.type = PKT_TYPE_REQUEST_ACK;
 #endif
-
     writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
     if( state == 0 )
     {
@@ -5080,18 +4989,29 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
         packet_sent.netkey[0]=_my_netkey[0];
         packet_sent.netkey[1]=_my_netkey[1];
         //#if (SX1272_debug_mode > 0)
-        printf("## Setting net key ##\n");
+        Serial.println(F("## Setting net key ##"));
         //#endif
         writeRegister(REG_FIFO, packet_sent.netkey[0]);
         writeRegister(REG_FIFO, packet_sent.netkey[1]);
 #endif
-        writeRegister(REG_FIFO, packet_sent.dst); 		// Writing the destination in FIFO
-        // added by C. Pham
-        writeRegister(REG_FIFO, packet_sent.type); 		// Writing the packet type in FIFO
-        writeRegister(REG_FIFO, packet_sent.src);		// Writing the source in FIFO
-        writeRegister(REG_FIFO, packet_sent.packnum);	// Writing the packet number in FIFO
-        // commented by C. Pham
-        //writeRegister(REG_FIFO, packet_sent.length); 	// Writing the packet length in FIFO
+        writeRegister(REG_FIFO, packet_sent.type); 		                                     // tipo
+		
+		for (int a = 0; a < 4; a++) {
+
+			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
+			printf("byte : MID( %d , %d ) ", (8 * a), (8 * (a + 1)));
+			Serial.println(MID(packet_sent.src, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+		}
+
+		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
+		printf("\n");
+		for (int a = 0; a < 2; a++) {
+			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
+			Serial.print("byte : ");
+			Serial.println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+		}
+
+		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
         for(unsigned int i = 0; i < _payloadlength; i++)
         {
             writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
@@ -5100,35 +5020,33 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
         //writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
         state = 0;
 #if (SX1272_debug_mode > 0)
-        printf("## Packet set and written in FIFO ##\n");
+        /*Serial.println(F("## Packet set and written in FIFO ##"));
         // Print the complete packet if debug_mode
-        printf("## Packet to send:  \n");
-        printf("Destination: ");
-        printf("%d\n", packet_sent.dst);			 	// Printing destination
-        printf("Type: ");
-        printf("%d\n", packet_sent.type);			 	// Printing type
-        printf("Source: ");
-        printf("%d\n", packet_sent.src);			 	// Printing source
-        printf("Packet number: ");
-        printf("%d\n", packet_sent.packnum);			// Printing packet number
-        printf("Packet length: ");
-        printf("%d\n", packet_sent.length);			// Printing packet length
-        printf("Data: ");
+        Serial.println(F("## Packet to send: "));
+        Serial.print(F("Destination: "));
+        Serial.println(packet_sent.dst);			 	// Printing destination
+        Serial.print(F("Packet type: "));
+        Serial.println(packet_sent.type);			// Printing packet type
+        Serial.print(F("Source: "));
+        Serial.println(packet_sent.src);			 	// Printing source
+        Serial.print(F("Packet number: "));
+        Serial.println(packet_sent.packnum);			// Printing packet number
+        Serial.print(F("Packet length: "));
+        Serial.println(packet_sent.length);			// Printing packet length
+        Serial.print(F("Data: "));
         for(unsigned int i = 0; i < _payloadlength; i++)
         {
-            printf("%c", packet_sent.data[i]);		// Printing payload
+            Serial.print((char)packet_sent.data[i]);		// Printing payload
         }
-        printf("\n");
-        //printf("Retry number: ");
-        //printf("%d\n", packet_sent.retry);			// Printing number retry
-        printf(" ##\n");
-        printf("\n");
+        Serial.println();
+        //Serial.print(F("Retry number: "));
+        //Serial.println(packet_sent.retry);			// Printing retry number
+        Serial.println(F("##"));*/
 #endif
     }
 
     return state;
 }
-
 /*
  Function: It sets a packet struct in FIFO in order to sent it.
  Returns:  Integer that determines if there has been any error
@@ -5136,118 +5054,119 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
+//Modificata da Ivano 18/08/2016
 uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 {
-    int8_t state = 2;
-    byte st0;
+	int8_t state = 2;
+
+
+	packet_sent.src = NETWORK_ID << 25| NETWORK_ADDRESS;
+	packet_sent.packnum = _packetNumber;
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'setPacket'\n");
+	Serial.println();
+	Serial.println(F("Starting 'setPacket'"));
 #endif
 
-    st0 = readRegister(REG_OP_MODE);	// Save the previous status
-    clearFlags();	// Initializing flags
+	clearFlags();	// Initializing flags
 
-    if( _modem == LORA )
-    { // LoRa mode
-        writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Stdby LoRa mode to write in FIFO
-    }
-    else
-    { // FSK mode
-        writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Stdby FSK mode to write in FIFO
-    }
+	if (_modem == LORA)
+	{ // LoRa mode
+		writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Stdby LoRa mode to write in FIFO
+	}
+	else
+	{ // FSK mode
+		writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Stdby FSK mode to write in FIFO
+	}
 
-    _reception = CORRECT_PACKET;	// Updating incorrect value to send a packet (old or new)
-    if( _retries == 0 )
-    { // Sending new packet
-        state = setDestination(dest);	// Setting destination in packet structure
-        if( state == 0 )
-        {
-            state = setPayload(payload);
-        }
-    }
-    else
-    {
-        if( _retries == 1 )
-        {
-            packet_sent.length++;
-        }
-        state = setPacketLength();
-        packet_sent.retry = _retries;
+	_reception = CORRECT_PACKET;	// Updating incorrect value
+
 #if (SX1272_debug_mode > 0)
-        printf("** Retrying to send last packet ");
-        printf("%d", _retries);
-        printf(" time **\n");
-#endif
-    }
-
-    // added by C. Pham
-    // set the type to be a data packet
-    packet_sent.type |= PKT_TYPE_DATA;
-
-#ifdef W_REQUESTED_ACK
-    // added by C. Pham
-    // indicate that an ACK should be sent by the receiver
-    if (_requestACK)
-        packet_sent.type |= PKT_FLAG_ACK_REQ;
+									/* Serial.print(F("** Retrying to send last packet "));
+									Serial.print(_retries, DEC);
+									Serial.println(F(" time **"));*/
 #endif
 
-    writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
-    if( state == 0 )
-    {
-        state = 1;
-        // Writing packet to send in FIFO
+
+	packet_sent.fCtrl = PKT_FCTRL_DATA;
+
+	//Hardcoded state 0 by Ivano 18/08/2016 Non setto più la destinazione perciò lo stato lo metto a 0 manualmente
+	state = 0;
+	writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
+	if (state == 0)
+	{
+		state = 1;
+		// Writing packet to send in FIFO
 #ifdef W_NET_KEY
-        // added by C. Pham
-        packet_sent.netkey[0]=_my_netkey[0];
-        packet_sent.netkey[1]=_my_netkey[1];
+		// added by C. Pham
+		packet_sent.netkey[0] = _my_netkey[0];
+		packet_sent.netkey[1] = _my_netkey[1];
+		//#if (SX1272_debug_mode > 0)
+		Serial.println(F("## Setting net key ##"));
+		//#endif
+		writeRegister(REG_FIFO, packet_sent.netkey[0]);
+		writeRegister(REG_FIFO, packet_sent.netkey[1]);
+#endif
+		writeRegister(REG_FIFO, packet_sent.type); 	
+		// tipo
 
-        writeRegister(REG_FIFO, packet_sent.netkey[0]);
-        writeRegister(REG_FIFO, packet_sent.netkey[1]);
-#endif
-        writeRegister(REG_FIFO, packet_sent.dst); 		// Writing the destination in FIFO
-        // added by C. Pham
-        writeRegister(REG_FIFO, packet_sent.type); 		// Writing the packet type in FIFO
-        writeRegister(REG_FIFO, packet_sent.src);		// Writing the source in FIFO
-        writeRegister(REG_FIFO, packet_sent.packnum);	// Writing the packet number in FIFO
-        // commented by C. Pham
-        //writeRegister(REG_FIFO, packet_sent.length); 	// Writing the packet length in FIFO
-        for(unsigned int i = 0; i < _payloadlength; i++)
-        {
-            writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
-        }
-        // commented by C. Pham
-        //writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
-        state = 0;
+		for (int a = 0; a < 4; a++) {
+
+			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
+			printf("byte : MID( %d , %d ) ", (8 * a) , (8 * (a + 1) ));
+			Serial.println(MID(packet_sent.src,(8*a),( 8*(a+1))), HEX);//4 byte di src
+		}
+
+		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
+		printf("\n");
+		for (int a = 0; a < 2; a++) {
+			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
+			Serial.print("byte : ");
+			Serial.println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+		}
+
+		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
+		for (unsigned int i = 0; i < _payloadlength; i++)
+		{
+			writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
+		}
+		// commented by C. Pham
+		//writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
+		state = 0;
+
 #if (SX1272_debug_mode > 0)
-        printf("## Packet set and written in FIFO ##\n");
-        // Print the complete packet if debug_mode
-        printf("## Packet to send:  \n");
-        printf("Destination: ");
-        printf("%d\n", packet_sent.dst);			 	// Printing destination
-        printf("Type: ");
-        printf("%d\n", packet_sent.type);			 	// Printing type
-        printf("Source: ");
-        printf("%d\n", packet_sent.src);			 	// Printing source
-        printf("Packet number: ");
-        printf("%d\n", packet_sent.packnum);			// Printing packet number
-        printf("Packet length: ");
-        printf("%d\n", packet_sent.length);			// Printing packet length
-        printf("Data: ");
-        for(unsigned int i = 0; i < _payloadlength; i++)
-        {
-            printf("%c", packet_sent.data[i]);		// Printing payload
-        }
-        printf("\n");
-        //printf("Retry number: ");
-        //printf("%d\n", packet_sent.retry);			// Printing number retry
-        printf(" ##\n");
-        printf("\n");
+		Serial.println(F("## Packet set and written in FIFO ##"));
+		// Print the complete packet if debug_mode
+		Serial.println(F("## Packet to send: "));
+		Serial.print(F("Destination: "));
+		Serial.println(packet_sent.dst);			 	// Printing destination
+		Serial.print(F("Packet type: "));
+		Serial.println(packet_sent.type);			// Printing packet type
+		Serial.print(F("Source: "));
+		Serial.println(packet_sent.src);			 	// Printing source
+		Serial.print(F("Packet number: "));
+		Serial.println(packet_sent.packnum);			// Printing packet number
+		Serial.print(F("Packet length: "));
+		Serial.println(packet_sent.length);			// Printing packet length
+		Serial.print(F("Data: "));
+		for(unsigned int i = 0; i < _payloadlength; i++)
+		{
+		Serial.print((char)packet_sent.data[i]);		// Printing payload
+		}
+		Serial.println();
+		//Serial.print(F("Retry number: "));
+		//Serial.println(packet_sent.retry);			// Printing retry number
+		Serial.println(F("##"));
 #endif
-    }
-    writeRegister(REG_OP_MODE, st0);	// Getting back to previous status
-    return state;
+	}
+
+	return state;
+}
+
+//Added by Ivano 19/08/2016 set packet type
+
+void SX1272::setType(uint8_t type) {
+	packet_sent.type = type;
 }
 
 /*
@@ -5760,6 +5679,7 @@ uint8_t SX1272::getACK()
  Parameters:
    wait: time to wait while there is no a valid header received.
 */
+//Modificato da Ivano 18/08/2016
 uint8_t SX1272::getACK(uint16_t wait)
 {
     uint8_t state = 2;
@@ -5767,10 +5687,10 @@ uint8_t SX1272::getACK(uint16_t wait)
     unsigned long previous;
     boolean a_received = false;
 
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'getACK'\n");
-#endif
+    //#if (SX1272_debug_mode > 1)
+    Serial.println();
+    Serial.println(F("Starting 'getACK'"));
+    //#endif
 
     previous = millis();
 
@@ -5788,6 +5708,10 @@ uint8_t SX1272::getACK(uint16_t wait)
         }
         if( bitRead(value, 6) == 1 )
         { // ACK received
+            // comment by C. Pham
+            // not really safe because the received packet may not be an ACK
+            // probability is low if using unicast to gateway, but if broadcast
+            // can get a packet from another node!!
             a_received = true;
         }
         // Standby para minimizar el consumo
@@ -5818,42 +5742,43 @@ uint8_t SX1272::getACK(uint16_t wait)
     if( a_received )
     {
         // Storing the received ACK
-        ACK.dst = _destination;
         ACK.type = readRegister(REG_FIFO);
-        ACK.src = readRegister(REG_FIFO);
-        ACK.packnum = readRegister(REG_FIFO);
-        ACK.length = readRegister(REG_FIFO);
+        ACK.src = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) << 24 ;
+		ACK.fCtrl = readRegister(REG_FIFO);
+        ACK.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8;
+		ACK.fPort = readRegister(REG_FIFO);
         ACK.data[0] = readRegister(REG_FIFO);
         ACK.data[1] = readRegister(REG_FIFO);
 
-        if (ACK.type == PKT_TYPE_ACK) {
+        if (ACK.fCtrl == PKT_FCTRL_ACK) {
 
             // Checking the received ACK
-            if( ACK.dst == packet_sent.src )
+            if( ACK.src & NETWORK_ID)
             {
-                if( ACK.src == packet_sent.dst )
+                if( ACK.src >> 7 & NETWORK_ADDRESS  )
                 {
                     if( ACK.packnum == packet_sent.packnum )
                     {
-                        if( ACK.length == 2 )
-                        {
+                        
                             if( ACK.data[0] == CORRECT_PACKET )
                             {
                                 state = 0;
                                 //#if (SX1272_debug_mode > 0)
                                 // Printing the received ACK
-                                printf("## ACK received:\n");
-                                printf("Destination: ");
-                                printf("%d\n", ACK.dst);			 	// Printing destination
-                                printf("Source: ");
-                                printf("%d\n", ACK.src);			 	// Printing source
-                                printf("ACK number: ");
-                                printf("%d\n", ACK.packnum);			// Printing ACK number
-                                printf("ACK length: ");
-                                printf("%d\n", ACK.length);				// Printing ACK length
-                                printf("ACK payload: ");
-                                printf("%d\n", ACK.data[0]);			// Printing ACK payload
-                                printf("ACK SNR of rcv pkt at gw: ");
+                                Serial.println(F("## ACK received:"));
+                                Serial.print(F("Type: "));
+                                Serial.println(ACK.type);			 	// Printing destination
+                                Serial.print(F("Source: "));
+                                Serial.println(ACK.src);			 	// Printing source
+                                Serial.print(F("ACK number: "));
+                                Serial.println(ACK.packnum);			// Printing ACK number
+                                Serial.print(F("ACK fCtrl: "));
+                                Serial.println(ACK.fCtrl);				// Printing ACK fctrl
+								Serial.print(F("ACK fPort: "));
+								Serial.println(ACK.fPort);              // Printing ACK fport
+                                Serial.print(F("ACK payload: "));
+                                Serial.println(ACK.data[0]);			// Printing ACK payload
+                                Serial.print(F("ACK SNR of rcv pkt at gw: "));
 
                                 value = ACK.data[1];
 
@@ -5869,69 +5794,60 @@ uint8_t SX1272::getACK(uint16_t wait)
                                     _rcv_snr_in_ack = ( value & 0xFF ) >> 2;
                                 }
 
-                                printf("%d\n", _rcv_snr_in_ack);
-                                printf(" ##\n");
-                                printf("\n");
+                                Serial.println(_rcv_snr_in_ack);
+                                Serial.println(F("##"));
+                                Serial.println();
                                 //#endif
                             }
                             else
                             {
                                 state = 1;
-    #if (SX1272_debug_mode > 0)
-                                printf("** N-ACK received **\n");
-                                printf("\n");
-    #endif
+                                //#if (SX1272_debug_mode > 0)
+                                Serial.println(F("** N-ACK received **"));
+                                Serial.println();
+                                //#endif
                             }
-                        }
-                        else
-                        {
-                            state = 1;
-    #if (SX1272_debug_mode > 0)
-                            printf("** ACK length incorrectly received **\n");
-                            printf("\n");
-    #endif
-                        }
+                        
                     }
                     else
                     {
                         state = 1;
-    #if (SX1272_debug_mode > 0)
-                        printf("** ACK number incorrectly received **\n");
-                        printf("\n");
-    #endif
+                        //#if (SX1272_debug_mode > 0)
+                        Serial.println(F("** ACK number incorrectly received **"));
+                        Serial.println();
+                        //#endif
                     }
                 }
                 else
                 {
                     state = 1;
-    #if (SX1272_debug_mode > 0)
-                    printf("** ACK source incorrectly received **\n");
-                    printf("\n");
-    #endif
+                    //#if (SX1272_debug_mode > 0)
+                    Serial.println(F("** ACK source incorrectly received **"));
+                    Serial.println();
+                    //#endif
                 }
             }
         }
         else
         {
             state = 1;
-#if (SX1272_debug_mode > 0)
-            printf("** ACK destination incorrectly received **\n");
-            printf("\n");
-#endif
+            //#if (SX1272_debug_mode > 0)
+            Serial.println(F("** ACK destination incorrectly received **"));
+            Serial.println();
+            //#endif
         }
     }
     else
     {
         state = 1;
-#if (SX1272_debug_mode > 0)
-        printf("** ACK lost **\n");
-        printf("\n");
-#endif
+        //#if (SX1272_debug_mode > 0)
+        Serial.println(F("** ACK lost **"));
+        Serial.println();
+        //#endif
     }
     clearFlags();	// Initializing flags
     return state;
 }
-
 /*
  Function: Configures the module to transmit information with retries in case of error.
  Returns: Integer that determines if there has been any error
@@ -5939,600 +5855,7 @@ uint8_t SX1272::getACK(uint16_t wait)
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
-uint8_t SX1272::sendPacketMAXTimeoutACKRetries(uint8_t dest, char  *payload)
-{
-    return sendPacketTimeoutACKRetries(dest, payload, MAX_TIMEOUT);
-}
 
-/*
- Function: Configures the module to transmit information with retries in case of error.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::sendPacketMAXTimeoutACKRetries(uint8_t dest, uint8_t *payload, uint16_t length16)
-{
-    return sendPacketTimeoutACKRetries(dest, payload, length16, MAX_TIMEOUT);
-}
-
-/*
- Function: Configures the module to transmit information with retries in case of error.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, char *payload)
-{
-    uint8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACKRetries'\n");
-#endif
-
-    // Sending packet to 'dest' destination and waiting an ACK response.
-    state = 1;
-    while( (state != 0) && (_retries <= _maxRetries) )
-    {
-        state = sendPacketTimeoutACK(dest, payload);
-        _retries++;
-    }
-    _retries = 0;
-
-    return state;
-}
-
-/*
- Function: Configures the module to transmit information with retries in case of error.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, uint8_t *payload, uint16_t length16)
-{
-    uint8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACKRetries'\n");
-#endif
-
-    // Sending packet to 'dest' destination and waiting an ACK response.
-    state = 1;
-    while((state != 0) && (_retries <= _maxRetries))
-    {
-        state = sendPacketTimeoutACK(dest, payload, length16);
-        _retries++;
-
-    }
-    _retries = 0;
-
-    return state;
-}
-
-/*
- Function: Configures the module to transmit information with retries in case of error.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, char *payload, uint16_t wait)
-{
-    uint8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACKRetries'\n");
-#endif
-
-    // Sending packet to 'dest' destination and waiting an ACK response.
-    state = 1;
-    while((state != 0) && (_retries <= _maxRetries))
-    {
-        state = sendPacketTimeoutACK(dest, payload, wait);
-        _retries++;
-    }
-    _retries = 0;
-
-    return state;
-}
-
-/*
- Function: Configures the module to transmit information with retries in case of error.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::sendPacketTimeoutACKRetries(uint8_t dest, uint8_t *payload, uint16_t length16, uint16_t wait)
-{
-    uint8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACKRetries'\n");
-#endif
-
-    // Sending packet to 'dest' destination and waiting an ACK response.
-    state = 1;
-    while((state != 0) && (_retries <= _maxRetries))
-    {
-        state = sendPacketTimeoutACK(dest, payload, length16, wait);
-        _retries++;
-    }
-    _retries = 0;
-
-    return state;
-}
-
-/*
- Function: It gets the temperature from the measurement block module.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::getTemp()
-{
-    byte st0;
-    uint8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'getTemp'\n");
-#endif
-
-    st0 = readRegister(REG_OP_MODE);	// Save the previous status
-
-    if( _modem == LORA )
-    { // Allowing access to FSK registers while in LoRa standby mode
-        writeRegister(REG_OP_MODE, LORA_STANDBY_FSK_REGS_MODE);
-    }
-
-    state = 1;
-    // Saving temperature value
-    _temp = readRegister(REG_TEMP);
-    if( _temp & 0x80 ) // The SNR sign bit is 1
-    {
-        // Invert and divide by 4
-        _temp = ( ( ~_temp + 1 ) & 0xFF );
-    }
-    else
-    {
-        // Divide by 4
-        _temp = ( _temp & 0xFF );
-    }
-
-
-#if (SX1272_debug_mode > 1)
-    printf("## Temperature is: ");
-    printf("%d", _temp);
-    printf(" ##\n");
-    printf("\n");
-#endif
-
-    if( _modem == LORA )
-    {
-        writeRegister(REG_OP_MODE, st0);	// Getting back to previous status
-    }
-
-    state = 0;
-    return state;
-}
-
-//**********************************************************************/
-// Added by C. Pham
-//**********************************************************************/
-
-void SX1272::setPacketType(uint8_t type)
-{
-    packet_sent.type=type;
-
-    if (type & PKT_FLAG_ACK_REQ)
-        _requestACK=1;
-}
-
-/*
- Function: Configures the module to perform CAD.
- Returns: Integer that determines if the number of requested CAD have been successfull
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-uint8_t SX1272::doCAD(uint8_t counter)
-{
-    uint8_t state = 2;
-    byte value = 0x00;
-    unsigned long startCAD, endCAD, startDoCad, endDoCad, previous;
-    uint16_t wait = 100;
-    bool failedCAD=false;
-    uint8_t retryCAD = 3;
-    uint8_t save_counter;
-    byte st0;
-
-    st0 = readRegister(REG_OP_MODE);	// Save the previous status
-
-#ifdef DEBUG_CAD
-    printf("SX1272::Starting 'doCAD'\n");
-#endif
-
-    save_counter = counter;
-
-    startDoCad=millis();
-
-    if( _modem == LORA ) { // LoRa mode
-
-        writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);
-
-        do {
-
-            // wait to CadDone flag
-            startCAD = previous = millis();
-
-            clearFlags();	// Initializing flags
-
-            writeRegister(REG_OP_MODE, LORA_CAD_MODE);  // LORA mode - Cad
-
-            value = readRegister(REG_IRQ_FLAGS);
-            // Wait until CAD ends (CAD Done flag) or the timeout expires
-            while ((bitRead(value, 2) == 0) && (millis() - previous < wait))
-            {
-                value = readRegister(REG_IRQ_FLAGS);
-                // Condition to avoid an overflow (DO NOT REMOVE)
-                if( millis() < previous )
-                {
-                    previous = millis();
-                }
-            }
-            state = 1;
-
-            endCAD = millis();
-
-            if( bitRead(value, 2) == 1 )
-            {
-                state = 0;	// CAD successfully performed
-#ifdef DEBUG_CAD				  
-                printf("SX1272::CAD duration ");
-                printf("%d\n", endCAD-startCAD);
-                printd("SX1272::CAD successfully performed\n");
-#endif				  
-
-                value = readRegister(REG_IRQ_FLAGS);
-
-                // look for the CAD detected bit
-                if( bitRead(value, 0) == 1 )
-                {
-                    // we detected activity
-                    failedCAD=true;
-#ifdef DEBUG_CAD				  		
-                    printf("SX1272::CAD exits after ");
-                    printf("%d\n", save_counter-counter);
-#endif				  		
-                }
-
-                counter--;
-            }
-            else
-            {
-#ifdef DEBUG_CAD			  	 	
-                printf("SX1272::CAD duration "));
-                printf("%d\n", endCAD-startCAD);
-#endif				  
-                if( state == 1 )
-                {
-#ifdef DEBUG_CAD
-                    printf("SX1272::Timeout has expired\n");
-#endif
-                }
-                else
-                {
-#ifdef DEBUG_CAD
-                    printf("SX1272::Error and CAD has not been performed\n");
-#endif
-                }
-
-                retryCAD--;
-
-                // to many errors, so exit by indicating that channel is not free
-                if (!retryCAD)
-                    failedCAD=true;
-            }
-
-        } while (counter && !failedCAD);
-    }
-
-    writeRegister(REG_OP_MODE, st0);
-
-    endDoCad=millis();
-
-    clearFlags();		// Initializing flags
-
-#ifdef DEBUG_CAD	  
-    printf("SX1272::doCAD duration ");
-    printf("%d\n", endDoCad-startDoCad);
-#endif
-
-    if (failedCAD)
-        return 2;
-
-    return state;
-}
-
-
-uint16_t SX1272::getToA(uint8_t pl) {
-
-    uint8_t DE = 0;
-    uint32_t airTime = 0;
-
-    double bw=0.0;
-
-    bw=(_bandwidth==BW_125)?125e3:((_bandwidth==BW_250)?250e3:500e3);
-
-#ifdef DEBUG_GETTOA
-    printf("SX1272::bw is ");
-    printf("%d\n", bw);
-
-    printf("SX1272::SF is ");
-    printf("%d\n", _spreadingFactor);
-#endif
-
-    //double ts=pow(2,_spreadingFactor)/bw;
-
-    ////// from LoRaMAC SX1272GetTimeOnAir()
-
-    // Symbol rate : time for one symbol (secs)
-    double rs = bw / ( 1 << _spreadingFactor);
-    double ts = 1 / rs;
-
-    // must add 4 to the programmed preamble length to get the effective preamble length
-    double tPreamble=((_preamblelength+4)+4.25)*ts;
-
-#ifdef DEBUG_GETTOA	
-    printf("SX1272::ts is ");
-    printf("%f\n", ts);
-    printf("SX1272::tPreamble is ");
-    printf("%f\n", tPreamble);
-#endif
-
-    // for low data rate optimization
-    if ((_bandwidth == BW_125) && _spreadingFactor == 12)
-        DE = 1;
-
-    // Symbol length of payload and time
-    double tmp = (8*pl - 4*_spreadingFactor + 28 + 16 - 20*_header) /
-            (double)(4*(_spreadingFactor-2*DE) );
-
-#ifdef DEBUG_GETTOA                         
-    printf("SX1272::tmp is ");
-    printf("%f\n", tmp);
-#endif
-
-    tmp = ceil(tmp)*(_codingRate + 4);
-
-    double nPayload = 8 + ( ( tmp > 0 ) ? tmp : 0 );
-
-#ifdef DEBUG_GETTOA    
-    printf("SX1272::nPayload is ");
-    printf("%d\n", nPayload);
-#endif
-    
-    double tPayload = nPayload * ts;
-    // Time on air
-    double tOnAir = tPreamble + tPayload;
-    // in us secs
-    airTime = floor( tOnAir * 1e6 + 0.999 );
-    
-    //////
-    
-#ifdef DEBUG_GETTOA    
-    printf("SX1272::airTime is ");
-    printf("%d\n", airTime);
-#endif
-    // return in ms
-    return ceil(airTime/1000)+1;
-}
-
-// need to set _send_cad_number to a value > 0
-// we advise using _send_cad_number=3 for a SIFS and _send_cad_number=9 for a DIFS
-// prior to send any data
-void SX1272::CarrierSense() {
-
-    int e;
-    bool carrierSenseRetry=false;
-
-    if (_send_cad_number && _enableCarrierSense) {
-        do {
-            do {
-
-                // check for free channel (SIFS/DIFS)
-                _startDoCad=millis();
-                e = doCAD(_send_cad_number);
-                _endDoCad=millis();
-
-                printf("--> CAD duration ");
-                printf("%d\n", _endDoCad-_startDoCad);
-
-                if (!e) {
-                    printf("OK1\n");
-
-                    if (_extendedIFS)  {
-                        // wait for random number of CAD
-                        uint8_t w = rand() % 8 + 1;
-
-                        printf("--> waiting for ");
-                        printf("%d",w);
-                        printf(" CAD = ");
-                        printf("%d\n",sx1272_CAD_value[_loraMode]*w);
-
-                        delay(sx1272_CAD_value[_loraMode]*w);
-
-                        // check for free channel (SIFS/DIFS) once again
-                        _startDoCad=millis();
-                        e = doCAD(_send_cad_number);
-                        _endDoCad=millis();
-
-                        printf("--> CAD duration ");
-                        printf("%d\n", _endDoCad-_startDoCad);
-
-                        if (!e)
-                            printf("OK2\n");
-                        else
-                            printf("###2\n");
-                    }
-                }
-                else {
-                    printf("###1\n");
-
-                    // wait for random number of DIFS
-                    uint8_t w = rand() % 8 + 1;
-
-                    printf("--> waiting for ");
-                    printf("%d",w);
-                    printf(" DIFS (DIFS=3SIFS) = ");
-                    printf("%d\n",sx1272_SIFS_value[_loraMode]*3*w);
-
-                    delay(sx1272_SIFS_value[_loraMode]*3*w);
-
-                    printf("--> retry\n");
-                }
-
-            } while (e);
-
-            // CAD is OK, but need to check RSSI
-            if (_RSSIonSend) {
-
-                e=getRSSI();
-
-                uint8_t rssi_retry_count=10;
-
-                if (!e) {
-
-                    printf("--> RSSI ");
-                    printf("%d\n",_RSSI);
-
-                    while (_RSSI > -90 && rssi_retry_count) {
-
-                        delay(1);
-                        getRSSI();
-                        printf("--> RSSI ");
-                        printf("%d\n",_RSSI);
-                        rssi_retry_count--;
-                    }
-                }
-                else
-                    printf("--> RSSI error\n");
-
-                if (!rssi_retry_count)
-                    carrierSenseRetry=true;
-                else
-                    carrierSenseRetry=false;
-            }
-
-        } while (carrierSenseRetry);
-    }
-}
-
-/*
- Function: Indicates the CR within the module is configured.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-   state = -1 --> Forbidden command for this protocol
-*/
-int8_t	SX1272::getSyncWord()
-{
-    int8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'getSyncWord'\n");
-#endif
-
-    if( _modem == FSK )
-    {
-        state = -1;		// sync word is not available in FSK mode
-#if (SX1272_debug_mode > 1)
-        printf("** FSK mode hasn't sync word **\n");
-#endif
-    }
-    else
-    {
-        _syncWord = readRegister(REG_SYNC_WORD);
-
-        state = 0;
-
-#if (SX1272_debug_mode > 1)
-        printf("## Sync word is ");
-        printf("%X",_syncWord);
-        printf(" ##\n");
-#endif
-    }
-    return state;
-}
-
-/*
- Function: Sets the sync word in the module.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-   state = -1 --> Forbidden command for this protocol
- Parameters:
-   cod: sw is sync word value to set in LoRa modem configuration.
-*/
-int8_t	SX1272::setSyncWord(uint8_t sw)
-{
-    byte st0;
-    int8_t state = 2;
-    byte config1;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'setSyncWord'\n");
-#endif
-
-    st0 = readRegister(REG_OP_MODE);		// Save the previous status
-
-    if( _modem == FSK )
-    {
-#if (SX1272_debug_mode > 1)
-        printf("## Notice that FSK hasn't sync word parameter, ");
-        printf("so you are configuring it in LoRa mode ##\n");
-#endif
-        state = setLORA();
-    }
-    writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);		// Set Standby mode to write in registers
-
-    writeRegister(REG_SYNC_WORD, sw);
-
-    delay(100);
-
-    config1 = readRegister(REG_SYNC_WORD);
-
-    if (config1==sw) {
-        state=0;
-        _syncWord = sw;
-#if (SX1272_debug_mode > 1)
-        printf("## Sync Word ");
-        printf("%X\n",sw);
-        printf(" has been successfully set ##\n");
-#endif
-    }
-    else {
-        state=1;
-#if (SX1272_debug_mode > 1)
-        printf("** There has been an error while configuring Sync Word parameter **\n");
-#endif
-    }
-
-    writeRegister(REG_OP_MODE,st0);	// Getting back to previous status
-    delay(100);
-    return state;
-}
+//Send with retries deleted by Ivano 18/08/2016
 
 SX1272 sx1272 = SX1272();
