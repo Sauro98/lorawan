@@ -47,7 +47,7 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	}
 	if (debug) {
 		printf("outside for loop\n");
-	}*/
+	}
 }
 
 ReceivedPacket::ReceivedPacket(pack originalPacket, int _gw_id) {
