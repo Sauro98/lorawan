@@ -4171,12 +4171,6 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 				//IVANO
 				//this is actually the source now
-				writeRegister(REG_FIFO_ADDR_PTR, 0x80);  	// Setting address pointer in FIFO data buffer
-				printf("type %04x \n",readRegister(REG_FIFO));//leave out the type
-				printf("src : %04x %04x %04x %04x \n", readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO));
-				printf("fctrl : %04x\n", readRegister(REG_FIFO));
-				printf("packnum : %04x %04x \n", readRegister(REG_FIFO), readRegister(REG_FIFO));
-				printf("fPort : %04x\n", readRegister(REG_FIFO));
                 _destination = 0;
             }
         }
@@ -4231,8 +4225,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 
         // modified by Ivano
-		printf("src : %04x \n",_destination);
-        if (_destination << 25 == NETWORK_ID)
+        if (_destination == 0)
 
         { // LoRa or FSK mode
             forme = true;
@@ -4260,8 +4253,7 @@ boolean	SX1272::availableData(uint16_t wait)
     //----else
     //	{
     //	}
-	////---------------------------DELETE THIS---------------------------------///
-	delay(5000);
+
     return forme;
 }
 
@@ -4344,7 +4336,7 @@ int8_t SX1272::getPacket(uint16_t wait)
     byte value = 0x00;
     unsigned long previous;
     boolean p_received = false;
-
+	printf("getting packet\n");
 #if (SX1272_debug_mode > 0)
 	printf("\n");
     printf("Starting 'getPacket'\n");
@@ -4451,6 +4443,11 @@ int8_t SX1272::getPacket(uint16_t wait)
 			packet_received.fCtrl = readRegister(REG_FIFO); //fctrl
 			packet_received.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 ;	// packNum
             packet_received.fPort = readRegister(REG_FIFO);	// fPort
+			printf("type %04x \n", packet_received.type);//leave out the type
+			printf("src : %04x  \n", packet_received.src);
+			printf("fctrl : %04x\n", packet_received.fCtrl);
+			printf("packnum : %04x \n", packet_received.packnum);
+			printf("fPort : %04x\n", packet_received.fPort);
         }
         else {
             packet_received.type = 0;
