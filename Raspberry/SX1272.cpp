@@ -3771,6 +3771,7 @@ uint8_t SX1272::receive()
         printf("\n");
 #endif
     }
+	printf("exiting receive with staus : %d \n", state);
     return state;
 }
 
