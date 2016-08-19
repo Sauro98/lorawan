@@ -3820,6 +3820,7 @@ uint8_t SX1272::receivePacketTimeout(uint16_t wait)
     state = receive();
     if( state == 0 )
     {
+
         if( availableData(wait) )
         {
 			printf("packet received\n");
@@ -4120,6 +4121,7 @@ boolean	SX1272::availableData(uint16_t wait)
     if( _modem == LORA )
     { // LoRa mode
         value = readRegister(REG_IRQ_FLAGS);
+		printf("Checking lora \n");
         // Wait to ValidHeader interrupt
         while( (bitRead(value, 4) == 0) && (millis() - previous < (unsigned long)wait) )
         {
