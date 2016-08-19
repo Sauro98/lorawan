@@ -4944,6 +4944,7 @@ uint8_t SX1272::setPayload(char *payload)
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
+//Modificata d aIvano 19/08/2016
 uint8_t SX1272::setPayload(uint8_t *payload)
 {
 	uint8_t state = 2;
@@ -4978,135 +4979,18 @@ uint8_t SX1272::setPayload(uint8_t *payload)
    state = 1  --> There has been an error while executing the command
    state = 0  --> The command has been executed with no errors
 */
-//Modificata da Ivano 18/08/2016
+//Modificata da Ivano 18/08/2016 - 19/08/2016
 uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 {
-	packet_sent.src = NETWORK_ID << 25| NETWORK_ADDRESS;
-    int8_t state = 2;
-
-
-#if (SX1272_debug_mode > 1)
-    Serial.println("");
-    Serial.println(F("Starting 'setPacket'"));
-#endif
-
-    clearFlags();	// Initializing flags
-
-    if( _modem == LORA )
-    { // LoRa mode
-        writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Stdby LoRa mode to write in FIFO
-    }
-    else
-    { // FSK mode
-        writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Stdby FSK mode to write in FIFO
-    }
-
-    _reception = CORRECT_PACKET;	// Updating incorrect value
-  
-#if (SX1272_debug_mode > 0)
-       /* printf(F("** Retrying to send last packet "));
-        printf(_retries, DEC);
-        Serial.println(F(" time **"));*/
-#endif
-    
-
-    // added by C. Pham
-    // set the type to be a data packet
-    packet_sent.fCtrl = PKT_FCTRL_DATA;
-
-#ifdef W_REQUESTED_ACK
-    // added by C. Pham
-    // indicate that an ACK should be sent by the receiver
-    if (_requestACK)
-        packet_sent.type = PKT_TYPE_REQUEST_ACK;
-#endif
-    writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
-    if( state == 0 )
-    {
-        state = 1;
-        // Writing packet to send in FIFO
-#ifdef W_NET_KEY
-        // added by C. Pham
-        packet_sent.netkey[0]=_my_netkey[0];
-        packet_sent.netkey[1]=_my_netkey[1];
-        //#if (SX1272_debug_mode > 0)
-        Serial.println(F("## Setting net key ##"));
-        //#endif
-        writeRegister(REG_FIFO, packet_sent.netkey[0]);
-        writeRegister(REG_FIFO, packet_sent.netkey[1]);
-#endif
-        writeRegister(REG_FIFO, packet_sent.type); 		                                     // tipo
-		
-		for (int a = 0; a < 4; a++) {
-
-			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
-			printf("byte : MID( %d , %d ) ", (8 * a), (8 * (a + 1)));
-			printf("%x\n",MID(packet_sent.src, (8 * a), (8 * (a + 1))));//4 byte di src
-		}
-
-		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
-		printf("\n");
-		for (int a = 0; a < 2; a++) {
-			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
-			printf("byte : ");
-			printf("%x\n", MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
-		}
-
-		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
-        for(unsigned int i = 0; i < _payloadlength; i++)
-        {
-            writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
-        }
-        // commented by C. Pham
-        //writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
-        state = 0;
-#if (SX1272_debug_mode > 0)
-        /*Serial.println(F("## Packet set and written in FIFO ##"));
-        // Print the complete packet if debug_mode
-        Serial.println(F("## Packet to send: "));
-        printf(F("Destination: "));
-        Serial.println(packet_sent.dst);			 	// Printing destination
-        printf(F("Packet type: "));
-        Serial.println(packet_sent.type);			// Printing packet type
-        printf(F("Source: "));
-        Serial.println(packet_sent.src);			 	// Printing source
-        printf(F("Packet number: "));
-        Serial.println(packet_sent.packnum);			// Printing packet number
-        printf(F("Packet length: "));
-        Serial.println(packet_sent.length);			// Printing packet length
-        printf(F("Data: "));
-        for(unsigned int i = 0; i < _payloadlength; i++)
-        {
-            printf((char)packet_sent.data[i]);		// Printing payload
-        }
-        Serial.println("");
-        //printf(F("Retry number: "));
-        //Serial.println(packet_sent.retry);			// Printing retry number
-        Serial.println(F("##"));*/
-#endif
-    }
-
-    return state;
-}
-/*
- Function: It sets a packet struct in FIFO in order to sent it.
- Returns:  Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-*/
-//Modificata da Ivano 18/08/2016
-uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
-{
+	packet_sent.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
+	packet_sent.packnum = _packetNumber;
+	setPayload(payload);
 	int8_t state = 2;
 
 
-	packet_sent.src = NETWORK_ID << 25| NETWORK_ADDRESS;
-	packet_sent.packnum = _packetNumber;
-
 #if (SX1272_debug_mode > 1)
 	Serial.println("");
-	Serial.println(F("Starting 'setPacket'"));
+	Serial.println("Starting 'setPacket'");
 #endif
 
 	clearFlags();	// Initializing flags
@@ -5123,14 +5007,126 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 	_reception = CORRECT_PACKET;	// Updating incorrect value
 
 #if (SX1272_debug_mode > 0)
-									/* printf(F("** Retrying to send last packet "));
-									printf(_retries, DEC);
+									/* Serial.print(F("** Retrying to send last packet "));
+									Serial.print(_retries, DEC);
 									Serial.println(F(" time **"));*/
 #endif
 
 
+									// added by C. Pham
+									// set the type to be a data packet
 	packet_sent.fCtrl = PKT_FCTRL_DATA;
+	packet_sent.fPort = F_PORT;
+	//Hardcoded state 0 by Ivano 18/08/2016 Non setto più la destinazione perciò lo stato lo metto a 0 manualmente
+	state = 0;
+#ifdef W_REQUESTED_ACK
+	// added by C. Pham
+	// indicate that an ACK should be sent by the receiver
+	if (_requestACK)
+		packet_sent.type = PKT_TYPE_REQUEST_ACK;
+#endif
+	writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
+	if (state == 0)
+	{
+		state = 1;
+		// Writing packet to send in FIFO
+#ifdef W_NET_KEY
+		// added by C. Pham
+		packet_sent.netkey[0] = _my_netkey[0];
+		packet_sent.netkey[1] = _my_netkey[1];
+		//#if (SX1272_debug_mode > 0)
+		//Serial.println(F("## Setting net key ##"));
+		//#endif
+		writeRegister(REG_FIFO, packet_sent.netkey[0]);
+		writeRegister(REG_FIFO, packet_sent.netkey[1]);
+#endif
+		writeRegister(REG_FIFO, packet_sent.type); 		                                     // tipo
 
+		for (int a = 0; a < 4; a++) {
+			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
+		}
+
+		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
+		printf("\n");
+		for (int a = 0; a < 2; a++) {
+			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
+		}
+		writeRegister(REG_PAYLOAD_LENGTH_LORA, _payloadlength + 1/*fctrl*/ + 4/*src*/ + 1 /*type*/ + 2 /*packnum*/ + 1/*fPort*/);
+		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
+		for (unsigned int i = 0; i < _payloadlength; i++)
+		{
+			writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
+		}
+		// commented by C. Pham
+		//writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
+		state = 0;
+#if (SX1272_debug_mode > 0)
+		/*Serial.println(F("## Packet set and written in FIFO ##"));
+		// Print the complete packet if debug_mode
+		Serial.println(F("## Packet to send: "));
+		Serial.print(F("Destination: "));
+		Serial.println(packet_sent.dst);			 	// Printing destination
+		Serial.print(F("Packet type: "));
+		Serial.println(packet_sent.type);			// Printing packet type
+		Serial.print(F("Source: "));
+		Serial.println(packet_sent.src);			 	// Printing source
+		Serial.print(F("Packet number: "));
+		Serial.println(packet_sent.packnum);			// Printing packet number
+		Serial.print(F("Packet length: "));
+		Serial.println(packet_sent.length);			// Printing packet length
+		Serial.print(F("Data: "));
+		for(unsigned int i = 0; i < _payloadlength; i++)
+		{
+		Serial.print((char)packet_sent.data[i]);		// Printing payload
+		}
+		Serial.println();
+		//Serial.print(F("Retry number: "));
+		//Serial.println(packet_sent.retry);			// Printing retry number
+		Serial.println(F("##"));*/
+#endif
+	}
+
+	return state;
+}
+/*
+ Function: It sets a packet struct in FIFO in order to sent it.
+ Returns:  Integer that determines if there has been any error
+   state = 2  --> The command has not been executed
+   state = 1  --> There has been an error while executing the command
+   state = 0  --> The command has been executed with no errors
+*/
+//Modificata da Ivano 18/08/2016
+uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
+{
+	int8_t state = 2;
+
+
+	packet_sent.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
+	packet_sent.packnum = _packetNumber;
+	setPayload(payload);
+#if (SX1272_debug_mode > 1)
+	Serial.println("");
+	Serial.println("Starting 'setPacket'");
+#endif
+
+	clearFlags();	// Initializing flags
+
+	if (_modem == LORA)
+	{ // LoRa mode
+		writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Stdby LoRa mode to write in FIFO
+	}
+	else
+	{ // FSK mode
+		writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Stdby FSK mode to write in FIFO
+	}
+
+	_reception = CORRECT_PACKET;	// Updating incorrect value
+
+
+
+
+	packet_sent.fCtrl = PKT_FCTRL_DATA;
+	packet_sent.fPort = F_PORT;
 	//Hardcoded state 0 by Ivano 18/08/2016 Non setto più la destinazione perciò lo stato lo metto a 0 manualmente
 	state = 0;
 	writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
@@ -5143,32 +5139,29 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 		packet_sent.netkey[0] = _my_netkey[0];
 		packet_sent.netkey[1] = _my_netkey[1];
 		//#if (SX1272_debug_mode > 0)
-		Serial.println(F("## Setting net key ##"));
+		//Serial.println(F("## Setting net key ##"));
 		//#endif
 		writeRegister(REG_FIFO, packet_sent.netkey[0]);
 		writeRegister(REG_FIFO, packet_sent.netkey[1]);
 #endif
-		writeRegister(REG_FIFO, packet_sent.type); 	
+		writeRegister(REG_FIFO, packet_sent.type);
 		// tipo
 
 		for (int a = 0; a < 4; a++) {
-
 			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
-			printf("byte : MID( %d , %d ) ", (8 * a) , (8 * (a + 1) ));
-			printf("%x\n", MID(packet_sent.src,(8*a),( 8*(a+1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
-		printf("\n");
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
-			printf("byte : ");
-			printf("%x\n", MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
-
+		writeRegister(REG_PAYLOAD_LENGTH_LORA, _payloadlength + 1/*fctrl*/ + 4/*src*/ + 1 /*type*/ + 2 /*packnum*/ + 1/*fPort*/);
+		printf("pl length : %d \n", _payloadlength);
+		// Storing payload length in LoRa mode
 		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
 		for (unsigned int i = 0; i < _payloadlength; i++)
 		{
+			printf("Writing payload : %d\n", packet_sent.data[i]);
 			writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
 		}
 		// commented by C. Pham
@@ -5176,28 +5169,28 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 		state = 0;
 
 #if (SX1272_debug_mode > 0)
-		Serial.println(F("## Packet set and written in FIFO ##"));
+		/*Serial.println(F("## Packet set and written in FIFO ##"));
 		// Print the complete packet if debug_mode
 		Serial.println(F("## Packet to send: "));
-		printf(F("Destination: "));
+		Serial.print(F("Destination: "));
 		Serial.println(packet_sent.dst);			 	// Printing destination
-		printf(F("Packet type: "));
+		Serial.print(F("Packet type: "));
 		Serial.println(packet_sent.type);			// Printing packet type
-		printf(F("Source: "));
+		Serial.print(F("Source: "));
 		Serial.println(packet_sent.src);			 	// Printing source
-		printf(F("Packet number: "));
+		Serial.print(F("Packet number: "));
 		Serial.println(packet_sent.packnum);			// Printing packet number
-		printf(F("Packet length: "));
+		Serial.print(F("Packet length: "));
 		Serial.println(packet_sent.length);			// Printing packet length
-		printf(F("Data: "));
+		Serial.print(F("Data: "));
 		for(unsigned int i = 0; i < _payloadlength; i++)
 		{
-		printf((char)packet_sent.data[i]);		// Printing payload
+		Serial.print((char)packet_sent.data[i]);		// Printing payload
 		}
-		Serial.println("");
-		//printf(F("Retry number: "));
+		Serial.println();
+		//Serial.print(F("Retry number: "));
 		//Serial.println(packet_sent.retry);			// Printing retry number
-		Serial.println(F("##"));
+		Serial.println(F("##"));*/
 #endif
 	}
 
