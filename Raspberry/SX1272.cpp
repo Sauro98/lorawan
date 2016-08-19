@@ -4439,13 +4439,13 @@ int8_t SX1272::getPacket(uint16_t wait)
         }
         // modified by C. Pham
         if (!_rawFormat) {
-			writeRegister(REG_FIFO_ADDR_PTR, 0x00);
+			writeRegister(REG_FIFO_ADDR_PTR, 0x00+1);
             packet_received.src = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) << 24;		// Src
-			writeRegister(REG_FIFO_ADDR_PTR, 0x00);
+			writeRegister(REG_FIFO_ADDR_PTR, 0x00+2);
 			packet_received.fCtrl = readRegister(REG_FIFO); //fctrl
-			writeRegister(REG_FIFO_ADDR_PTR, 0x00);
+			writeRegister(REG_FIFO_ADDR_PTR, 0x00+3);
 			packet_received.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 ;	// packNum
-			writeRegister(REG_FIFO_ADDR_PTR, 0x00);
+			writeRegister(REG_FIFO_ADDR_PTR, 0x00+4);
             packet_received.fPort = readRegister(REG_FIFO);	// fPort
 			printf("type %04x \n", packet_received.type);//leave out the type
 			printf("src : %04x  \n", packet_received.src);
