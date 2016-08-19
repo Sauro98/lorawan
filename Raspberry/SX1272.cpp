@@ -4427,7 +4427,7 @@ int8_t SX1272::getPacket(uint16_t wait)
         {
             // comment by C. Pham
             // set the FIFO addr to 0 to read again all the bytes
-            writeRegister(REG_FIFO_ADDR_PTR, 0x00);  	// Setting address pointer in FIFO data buffer
+            writeRegister(REG_FIFO_ADDR_PTR, 0x80);  	// Setting address pointer in FIFO data buffer
 
 #ifdef W_NET_KEY
             // added by C. Pham
