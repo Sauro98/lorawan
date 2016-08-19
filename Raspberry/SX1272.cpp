@@ -4171,8 +4171,12 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 				//IVANO
 				//this is actually the source now
+				writeRegister(REG_FIFO_ADDR_PTR, 0x00);  	// Setting address pointer in FIFO data buffer
 				printf("type %04x \n",readRegister(REG_FIFO));//leave out the type
-				printf("src : %04x %04x %04x %04x ", readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO));
+				printf("src : %04x %04x %04x %04x \n", readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO), readRegister(REG_FIFO));
+				printf("fctrl : %04x\n", readRegister(REG_FIFO));
+				printf("packnum : %04x %04x \n", readRegister(REG_FIFO), readRegister(REG_FIFO));
+				printf("fPort : %04x", readRegister(REG_FIFO));
                 _destination = 0;
             }
         }
