@@ -4121,7 +4121,6 @@ boolean	SX1272::availableData(uint16_t wait)
     if( _modem == LORA )
     { // LoRa mode
         value = readRegister(REG_IRQ_FLAGS);
-		printf("Checking lora \n");
         // Wait to ValidHeader interrupt
         while( (bitRead(value, 4) == 0) && (millis() - previous < (unsigned long)wait) )
         {
@@ -4167,6 +4166,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 				//IVANO
 				//this is actually the source now
+				readRegister(REG_FIFO);//skip type
                 _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) <<24;
             }
         }
