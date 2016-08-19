@@ -3023,67 +3023,7 @@ int8_t SX1272::setPacketLength()
     return setPacketLength(length);
 }
 
-/*
- Function: Sets the packet length in the module.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
-   state = -1 --> Forbidden command for this protocol
- Parameters:
-   l: length value to set as payload length.
-*/
-int8_t SX1272::setPacketLength(uint8_t l)
-{
-    byte st0;
-    byte value = 0x00;
-    int8_t state = 2;
-
-#if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'setPacketLength'\n");
-#endif
-
-    st0 = readRegister(REG_OP_MODE);	// Save the previous status
-    packet_sent.length = l;
-
-    if( _modem == LORA )
-    { // LORA mode
-        writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);    // Set LoRa Standby mode to write in registers
-        writeRegister(REG_PAYLOAD_LENGTH_LORA, packet_sent.length);
-        // Storing payload length in LoRa mode
-        value = readRegister(REG_PAYLOAD_LENGTH_LORA);
-    }
-    else
-    { // FSK mode
-        writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);    //  Set FSK Standby mode to write in registers
-        writeRegister(REG_PAYLOAD_LENGTH_FSK, packet_sent.length);
-        // Storing payload length in FSK mode
-        value = readRegister(REG_PAYLOAD_LENGTH_FSK);
-    }
-
-    if( packet_sent.length == value )
-    {
-        state = 0;
-#if (SX1272_debug_mode > 1)
-        printf("## Packet length ");
-        printf("%d", packet_sent.length);
-        printf(" has been successfully set ##\n");
-        printf("\n");
-#endif
-    }
-    else
-    {
-        state = 1;
-    }
-
-    writeRegister(REG_OP_MODE, st0);	// Getting back to previous status
-    // comment by C. Pham
-    // this delay is included in the send delay overhead
-    // TODO: do we really need this delay?
-    delay(250);
-    return state;
-}
+//SetPacketLenght removed by Ivano 19/08/2016
 
 /*
  Function: Gets the node address in the module.

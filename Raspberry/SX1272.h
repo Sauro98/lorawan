@@ -984,6 +984,9 @@ public:
 	*/
 	uint8_t sendPacketTimeout(uint8_t dest, char *payload);
 
+	//Added by Ivano 19/08/2016
+	void SX1272::setPacketFctrl(uint8_t type);
+
 	//! It sends the packet wich payload is a parameter before ending MAX_TIMEOUT.
 	/*!
 	\param uint8_t dest : packet destination.
