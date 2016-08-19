@@ -4257,6 +4257,11 @@ boolean	SX1272::availableData(uint16_t wait)
     return forme;
 }
 
+int8_t SX1272::getPacket()
+{
+	return getPacket(MAX_TIMEOUT);
+}
+
 /*
  Function: It gets and stores a packet if it is received before MAX_TIMEOUT expires.
  Returns:  Integer that determines if there has been any error
