@@ -3684,13 +3684,11 @@ uint8_t SX1272::setACK()
         //#if (SX1272_debug_mode > 0)
 		printf("## ACK set and written in FIFO ##");
 		// Print the complete ACK if debug_mode
-		printf("## ACK to send:\n");
-		println(ACK.dst);	*/		 	// Printing destination
-		printf(("Source: ");
+		printf("## ACK to send:\n");	 	// Printing destination
+		printf("Source: ");
 		printf("%x \n",ACK.src);			 	// Printing source
 		printf("ACK number: ");
-		printf("%d \n",ACK.packnum);			// Printing ACK number
-												println(ACK.length);		*/		// Printing ACK length
+		printf("%d \n",ACK.packnum);			// Printing ACK number	// Printing ACK length
 		printf("ACK payload: ");
 		printf("%d\n",ACK.data[0]);			// Printing ACK payload
         //#endif
