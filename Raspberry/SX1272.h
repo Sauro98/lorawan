@@ -1158,6 +1158,10 @@ public:
 	*/
 	uint8_t getTemp();
 
+
+	//Added by Ivano 19/06/2016
+	void setPacketFctrl(uint8_t);
+
         // added by C. Pham
     void setPacketType(uint8_t type);
     void RxChainCalibration();
