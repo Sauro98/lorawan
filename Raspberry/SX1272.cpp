@@ -4445,7 +4445,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             packet_received.fPort = readRegister(REG_FIFO);	// fPort
 			printf("type %04x \n", packet_received.type);//leave out the type
 			printf("src : %04x  \n", packet_received.src);
-			printf("netID : %04x \n", packet_received << 25);
+			printf("netID : %04x \n", packet_received.src << 25);
 			printf("fctrl : %04x\n", packet_received.fCtrl);
 			printf("packnum : %04x \n", packet_received.packnum);
 			printf("fPort : %04x\n", packet_received.fPort);
