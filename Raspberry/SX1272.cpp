@@ -4226,7 +4226,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #endif
 
         // modified by Ivano
-		printf("src : %04x ",_destination);
+		printf("src : %04x \n",_destination);
         if (_destination << 25 == NETWORK_ID)
 
         { // LoRa or FSK mode
