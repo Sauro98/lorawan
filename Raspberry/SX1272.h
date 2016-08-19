@@ -1141,13 +1141,6 @@ public:
 	\return '0' on success, '1' otherwise
 	*/
 	uint8_t getTemp();
-
-
-	//Added by Ivano 19/06/2016
-	void setPacketFctrl(uint8_t);
-	//Added by Ivano 19/06/2016
-	void setType(uint8_t);
-
         // added by C. Pham
     void setPacketType(uint8_t type);
     void RxChainCalibration();
@@ -1156,6 +1149,15 @@ public:
     void CarrierSense();
     int8_t setSyncWord(uint8_t sw);
     int8_t getSyncWord();
+
+
+
+	//Added by Ivano 19/06/2016
+	void setPacketFctrl(uint8_t);
+	//Added by Ivano 19/06/2016
+	void setType(uint8_t);
+
+
 
     // SX1272 or SX1276?
     uint8_t _board;
