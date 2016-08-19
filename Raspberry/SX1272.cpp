@@ -3673,7 +3673,7 @@ uint8_t SX1272::setACK()
 		}
 
 		writeRegister(REG_FIFO, ACK.fPort);
-		writeRegister(REG_PAYLOAD_LENGTH_LORA, 2 + 4);
+		writeRegister(REG_PAYLOAD_LENGTH_LORA,8 + 4);
         writeRegister(REG_FIFO, ACK.data[0]);	// Writing the ACK in FIFO
         writeRegister(REG_FIFO, ACK.data[1]);	// Writing the ACK in FIFO
 
