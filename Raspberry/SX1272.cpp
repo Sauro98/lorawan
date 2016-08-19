@@ -4452,6 +4452,7 @@ int8_t SX1272::getPacket(uint16_t wait)
         //Commentato da Ivano 18/08/2016 lenght non esiste più - > packet_received.length = readRegister(REG_RX_NB_BYTES);
 		int l = readRegister(REG_RX_NB_BYTES);
 		printf("lenght : %d\n",l);
+		writeRegister(REG_FIFO_ADDR_PTR, 0x00);
             for(unsigned int i = 0; i < l; i++)
             {
 				//Added by Ivano 18/08/2016
