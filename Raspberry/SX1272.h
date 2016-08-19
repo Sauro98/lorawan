@@ -1161,6 +1161,8 @@ public:
 
 	//Added by Ivano 19/06/2016
 	void setPacketFctrl(uint8_t);
+	//Added by Ivano 19/06/2016
+	void setType(uint8_t);
 
         // added by C. Pham
     void setPacketType(uint8_t type);
