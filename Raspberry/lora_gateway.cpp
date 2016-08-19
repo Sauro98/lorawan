@@ -899,7 +899,7 @@ void loop(void)
       e = sx1272.receivePacketTimeout(w_timer);
       
       if (!e && sx1272._requestACK_indicator) {
-         sprintf(sprintf_buf,"^$ACK requested by %d\n", sx1272.packet_received.src);                   
+         sprintf(sprintf_buf,"^$ACK requested by %x\n", sx1272.packet_received.src);                   
          PRINT_STR("%s",sprintf_buf);        
       }
 #else
