@@ -5685,8 +5685,8 @@ uint8_t SX1272::getACK(uint16_t wait)
     boolean a_received = false;
 
     //#if (SX1272_debug_mode > 1)
-    println();
-    println(F("Starting 'getACK'"));
+    printf("\n");
+    println("Starting 'getACK'");
     //#endif
 
     previous = millis();
