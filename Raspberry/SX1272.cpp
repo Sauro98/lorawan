@@ -4262,6 +4262,55 @@ int8_t SX1272::getPacket()
 	return getPacket(MAX_TIMEOUT);
 }
 
+uint8_t SX1272::getTemp()
+{
+	byte st0;
+	uint8_t state = 2;
+
+#if (SX1272_debug_mode > 1)
+	printf("\n");
+	printf("Starting 'getTemp'\n");
+#endif
+
+	st0 = readRegister(REG_OP_MODE);	// Save the previous status
+
+	if (_modem == LORA)
+	{ // Allowing access to FSK registers while in LoRa standby mode
+		writeRegister(REG_OP_MODE, LORA_STANDBY_FSK_REGS_MODE);
+	}
+
+	state = 1;
+	// Saving temperature value
+	_temp = readRegister(REG_TEMP);
+	if (_temp & 0x80) // The SNR sign bit is 1
+	{
+		// Invert and divide by 4
+		_temp = ((~_temp + 1) & 0xFF);
+	}
+	else
+	{
+		// Divide by 4
+		_temp = (_temp & 0xFF);
+	}
+
+
+#if (SX1272_debug_mode > 1)
+	printf("## Temperature is: ");
+	printf("%d", _temp);
+	printf(" ##\n");
+	printf("\n");
+#endif
+
+	if (_modem == LORA)
+	{
+		writeRegister(REG_OP_MODE, st0);	// Getting back to previous status
+	}
+
+	state = 0;
+	return state;
+}
+
+
 /*
  Function: It gets and stores a packet if it is received before MAX_TIMEOUT expires.
  Returns:  Integer that determines if there has been any error
