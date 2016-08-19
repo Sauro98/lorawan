@@ -4330,7 +4330,6 @@ int8_t SX1272::getPacket(uint16_t wait)
     byte value = 0x00;
     unsigned long previous;
     boolean p_received = false;
-	printf("getting packet\n");
 #if (SX1272_debug_mode > 0)
 	printf("\n");
     printf("Starting 'getPacket'\n");
