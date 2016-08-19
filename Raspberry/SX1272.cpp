@@ -4997,7 +4997,7 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 
 			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
 			printf("byte : MID( %d , %d ) ", (8 * a), (8 * (a + 1)));
-			println(MID(packet_sent.src, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+			printf("%x\n",MID(packet_sent.src, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
@@ -5005,7 +5005,7 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
 			printf("byte : ");
-			println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+			printf("%x\n", MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
@@ -5111,7 +5111,7 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 
 			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
 			printf("byte : MID( %d , %d ) ", (8 * a) , (8 * (a + 1) ));
-			println(MID(packet_sent.src,(8*a),( 8*(a+1))), HEX);//4 byte di src
+			printf("%x\n", MID(packet_sent.src,(8*a),( 8*(a+1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
@@ -5119,7 +5119,7 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
 			printf("byte : ");
-			println(MID(packet_sent.packnum, (8 * a), (8 * (a + 1))), HEX);//4 byte di src
+			printf("%x\n", MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));//4 byte di src
 		}
 
 		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
