@@ -4986,10 +4986,10 @@ uint8_t SX1272::setPayload(uint8_t *payload)
 //Modificata da Ivano 18/08/2016 - 19/08/2016
 uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 {
-	packet_sent.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
-	packet_sent.packnum = _packetNumber;
-	setPayload(payload);
 	int8_t state = 2;
+
+
+
 
 
 #if (SX1272_debug_mode > 1)
@@ -5010,25 +5010,30 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 
 	_reception = CORRECT_PACKET;	// Updating incorrect value
 
-#if (SX1272_debug_mode > 0)
-									/* Serial.print(F("** Retrying to send last packet "));
-									Serial.print(_retries, DEC);
-									Serial.println(F(" time **"));*/
-#endif
-
-
-									// added by C. Pham
-									// set the type to be a data packet
-	packet_sent.fCtrl = PKT_FCTRL_DATA;
+									//-----SETTING DEL PACCHETTO-----//
+									//MAC HEADER//
+									//type viene settato prima nelle funzioni sendPacket
+									//MAC HEADER//
+									//MAC PAYLOAD//
+									//--FHDR--//
+									//DevAddress
+	packet_sent.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
+	//Fctrl
+	packet_sent.fCtrl = PKT_FCTRL_DATA; // è un pacchetto di dati	
+	packet_sent.packnum = _packetNumber;//Fcount
+										//Non servono i byte per Fopt
+										//--FHDR--//
+										//--FPORT--//
 	packet_sent.fPort = F_PORT;
+	//--FPORT--//
+	//--Payload--//
+	setPayload(payload);
+	//--Payload--//
+	//MAC PAYLOAD//
+	//MIC (MESSAGE INTEGRITY CHECK) non ancora implementato
+
 	//Hardcoded state 0 by Ivano 18/08/2016 Non setto più la destinazione perciò lo stato lo metto a 0 manualmente
 	state = 0;
-#ifdef W_REQUESTED_ACK
-	// added by C. Pham
-	// indicate that an ACK should be sent by the receiver
-	if (_requestACK)
-		packet_sent.type = PKT_TYPE_REQUEST_ACK;
-#endif
 	writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
 	if (state == 0)
 	{
@@ -5044,18 +5049,19 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 		writeRegister(REG_FIFO, packet_sent.netkey[0]);
 		writeRegister(REG_FIFO, packet_sent.netkey[1]);
 #endif
-		writeRegister(REG_FIFO, packet_sent.type); 		                                     // tipo
+		writeRegister(REG_FIFO, packet_sent.type);
+		// tipo
 
 		for (int a = 0; a < 4; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.src, (8 * a), (8 * (a + 1))));
 		}
 
 		writeRegister(REG_FIFO, packet_sent.fCtrl); //fCtrl
-		printf("\n");
 		for (int a = 0; a < 2; a++) {
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
 		}
 		writeRegister(REG_PAYLOAD_LENGTH_LORA, _payloadlength + 1/*fctrl*/ + 4/*src*/ + 1 /*type*/ + 2 /*packnum*/ + 1/*fPort*/);
+		// Storing payload length in LoRa mode
 		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
 		for (unsigned int i = 0; i < _payloadlength; i++)
 		{
@@ -5064,32 +5070,8 @@ uint8_t SX1272::setPacket(uint8_t dest, char *payload)
 		// commented by C. Pham
 		//writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
 		state = 0;
-#if (SX1272_debug_mode > 0)
-		/*Serial.println(F("## Packet set and written in FIFO ##"));
-		// Print the complete packet if debug_mode
-		Serial.println(F("## Packet to send: "));
-		Serial.print(F("Destination: "));
-		Serial.println(packet_sent.dst);			 	// Printing destination
-		Serial.print(F("Packet type: "));
-		Serial.println(packet_sent.type);			// Printing packet type
-		Serial.print(F("Source: "));
-		Serial.println(packet_sent.src);			 	// Printing source
-		Serial.print(F("Packet number: "));
-		Serial.println(packet_sent.packnum);			// Printing packet number
-		Serial.print(F("Packet length: "));
-		Serial.println(packet_sent.length);			// Printing packet length
-		Serial.print(F("Data: "));
-		for(unsigned int i = 0; i < _payloadlength; i++)
-		{
-		Serial.print((char)packet_sent.data[i]);		// Printing payload
-		}
-		Serial.println();
-		//Serial.print(F("Retry number: "));
-		//Serial.println(packet_sent.retry);			// Printing retry number
-		Serial.println(F("##"));*/
-#endif
-	}
 
+	}
 	return state;
 }
 /*
