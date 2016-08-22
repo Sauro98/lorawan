@@ -5641,7 +5641,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload, uint16_t wait)
 	if (state == 0)
 	{
 		// added by C. Pham
-		Serial.println(F("wait for ACK"));
+		Serial.println("wait for ACK");
 
 		if (availableData())
 		{
@@ -5651,7 +5651,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload, uint16_t wait)
 		{
 			state_f = 3;
 			// added by C. Pham
-			Serial.println(F("no ACK"));
+			Serial.println("no ACK");
 		}
 	}
 	else
@@ -5665,12 +5665,6 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload, uint16_t wait)
 	return state_f;
 }
 
-
-//Added by Ivano 19/08/2016 set packet type
-
-void SX1272::setType(uint8_t type) {
-	packet_sent.type = type;
-}
 
 /*
 Function: Configures the module to transmit information and receive an ACK.
