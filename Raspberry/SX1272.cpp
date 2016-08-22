@@ -5338,7 +5338,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload)
 {
 	//Added by Ivano 22/08/2016
 	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
-		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+		packet_sent.type = PKT_TYPE_NO_ACK; //Not requesting ACK here
 	}
 
 	uint8_t state = 2;
@@ -5370,7 +5370,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t lengt
 
 	//Added by Ivano 22/08/2016
 	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
-		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+		packet_sent.type = PKT_TYPE_NO_ACK; //Not requesting ACK here
 	}
 
 #if (SX1272_debug_mode > 1)
@@ -5406,7 +5406,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload, uint16_t wait)
 	uint8_t state = 2;
 	//Added by Ivano 22/08/2016
 	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
-		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+		packet_sent.type = PKT_TYPE_NO_ACK; //Not requesting ACK here
 	}
 #if (SX1272_debug_mode > 1)
 	Serial.println();
@@ -5435,7 +5435,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t lengt
 	_payloadlength = length16;
 	//Added by Ivano 22/08/2016
 	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
-		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+		packet_sent.type = PKT_TYPE_NO_ACK; //Not requesting ACK here
 	}
 #if (SX1272_debug_mode > 1)
 	Serial.println();
@@ -5498,7 +5498,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload)
 	uint8_t state = 2;
 	uint8_t state_f = 2;
 	//Added by Ivano 22/08/2016
-	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
+	packet_sent.type = PKT_TYPE_REQUEST_ACK;//Requesting ACK here
 
 
 #if (SX1272_debug_mode > 1)
@@ -5561,7 +5561,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	uint8_t state_f = 2;
 
 	//Added by Ivano 22/08/2016
-	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
+	packet_sent.type = PKT_TYPE_REQUEST_ACK; //Requesting ACK here
 #if (SX1272_debug_mode > 1)
 		Serial.println();
 	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
@@ -5618,7 +5618,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload, uint16_t wait)
 	uint8_t state_f = 2;
 
 	//Added by Ivano 22/08/2016
-	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
+	packet_sent.type = PKT_TYPE_REQUEST_ACK; //Requesting ACK here
 
 #if (SX1272_debug_mode > 1)
 		Serial.println();
@@ -5687,7 +5687,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	_payloadlength = length16;
 
 	//Added by Ivano 22/08/2016
-	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
+	packet_sent.type = PKT_TYPE_REQUEST_ACK; //Requesting ACK here
 
 #if (SX1272_debug_mode > 1)
 		Serial.println();
@@ -5697,8 +5697,6 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 #ifdef W_REQUESTED_ACK
 	_requestACK = 1;
 #endif
-	//Aggiunto da Ivano 19/08/2016
-	packet_sent.type = PKT_TYPE_REQUEST_ACK;
 
 	state = sendPacketTimeout(dest, payload, length16, wait);	// Sending packet to 'dest' destination
 
