@@ -313,7 +313,7 @@ uint8_t unlocked_try=3;
 boolean unlocked=false;
 boolean receivedFromSerial=false;
 boolean receivedFromLoRa=false;
-boolean withAck=true;
+boolean withAck=false;
 
 char keyPressBuff[30];
 uint8_t keyIndex=0;
