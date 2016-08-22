@@ -4134,6 +4134,7 @@ boolean	SX1272::availableData(uint16_t wait)
         } // end while (millis)
         if( bitRead(value, 4) == 1 )
         { // header received
+			printf("## Valid Header received in LoRa mode ##\n");
 #if (SX1272_debug_mode > 0)
             printf("## Valid Header received in LoRa mode ##\n");
 #endif
