@@ -4391,7 +4391,7 @@ int8_t SX1272::getPacket(uint16_t wait)
                 _reception = CORRECT_PACKET;
                 p_received = true;
 #if (SX1272_debug_mode > 0)
-                Serial.println(F("## Packet correctly received in FSK mode ##"));
+                Serial.println("## Packet correctly received in FSK mode ##");
 #endif
             }
             else
@@ -4400,14 +4400,14 @@ int8_t SX1272::getPacket(uint16_t wait)
                 state = 3;
                 p_received = false;
 #if (SX1272_debug_mode > 0)
-                Serial.println(F("## Packet incorrectly received in FSK mode ##"));
+                Serial.println("## Packet incorrectly received in FSK mode ##");
 #endif
             }
         }
         else
         {
 #if (SX1272_debug_mode > 0)
-            Serial.println(F("** The timeout has expired **"));
+            Serial.println("** The timeout has expired **");
             Serial.println("");
 #endif
         }
@@ -4466,7 +4466,7 @@ int8_t SX1272::getPacket(uint16_t wait)
 
             // Print the packet if debug_mode
 #if (SX1272_debug_mode > 0)
-            Serial.println(F("## Packet received:"));
+            Serial.println("## Packet received:");
             printf(F("Destination: "));		
             printf(F("Type: "));
             Serial.println(packet_received.type);			 	// Printing source
@@ -4484,7 +4484,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             Serial.println("");
             //printf(F("Retry number: "));
             //Serial.println(packet_received.retry);			// Printing number retry
-            Serial.println(F("##"));
+            Serial.println("##");
             Serial.println("");
 #endif
             state = 0;
@@ -4511,7 +4511,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             // bug? not needed?
             //_retries++;
 #if (SX1272_debug_mode > 0)
-            Serial.println(F("## Retrying to send the last packet ##"));
+            Serial.println("## Retrying to send the last packet ##");
             Serial.println("");
 #endif
         }
@@ -4525,7 +4525,7 @@ int8_t SX1272::getPacket(uint16_t wait)
     {
         state = -1;
 #if (SX1272_debug_mode > 0)
-        Serial.println(F("** The timeout must be smaller than 12.5 seconds **"));
+        Serial.println("** The timeout must be smaller than 12.5 seconds **);
         Serial.println("");
 #endif
     }
@@ -5344,7 +5344,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload)
 	uint8_t state = 2;
 
 #if (SX1272_debug_mode > 1)
-	Serial.println();
+	Serial.println("");
 	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
@@ -5374,7 +5374,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t lengt
 	}
 
 #if (SX1272_debug_mode > 1)
-	Serial.println();
+	Serial.println("");
 	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
@@ -5409,7 +5409,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload, uint16_t wait)
 		packet_sent.type = PKT_TYPE_NO_ACK; //Not requesting ACK here
 	}
 #if (SX1272_debug_mode > 1)
-	Serial.println();
+	Serial.println("");
 	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
@@ -5438,7 +5438,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t lengt
 		packet_sent.type = PKT_TYPE_NO_ACK; //Not requesting ACK here
 	}
 #if (SX1272_debug_mode > 1)
-	Serial.println();
+	Serial.println("");
 	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
@@ -5502,8 +5502,8 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload)
 
 
 #if (SX1272_debug_mode > 1)
-		Serial.println();
-	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
+		Serial.println("");
+	Serial.println("Starting 'sendPacketTimeoutACK'");
 #endif
 
 #ifdef W_REQUESTED_ACK
@@ -5563,8 +5563,8 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	//Added by Ivano 22/08/2016
 	packet_sent.type = PKT_TYPE_REQUEST_ACK; //Requesting ACK here
 #if (SX1272_debug_mode > 1)
-		Serial.println();
-	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
+		Serial.println("");
+	Serial.println("Starting 'sendPacketTimeoutACK'");
 #endif
 
 #ifdef W_REQUESTED_ACK
@@ -5621,8 +5621,8 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload, uint16_t wait)
 	packet_sent.type = PKT_TYPE_REQUEST_ACK; //Requesting ACK here
 
 #if (SX1272_debug_mode > 1)
-		Serial.println();
-	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
+		Serial.println("");
+	Serial.println("Starting 'sendPacketTimeoutACK'");
 #endif
 
 #ifdef W_REQUESTED_ACK
@@ -5684,8 +5684,8 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	packet_sent.type = PKT_TYPE_REQUEST_ACK; //Requesting ACK here
 
 #if (SX1272_debug_mode > 1)
-		Serial.println();
-	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
+		Serial.println("");
+	Serial.println("Starting 'sendPacketTimeoutACK'");
 #endif
 
 #ifdef W_REQUESTED_ACK
