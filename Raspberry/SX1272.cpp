@@ -126,6 +126,8 @@ uint8_t SX1272::ON()
 
     // Powering the module
     pinMode(SX1272_SS,OUTPUT);
+	digitalWrite(SX1272_SS, LOW);
+	delay(1000);
     digitalWrite(SX1272_SS,HIGH);
     delay(100);
 
