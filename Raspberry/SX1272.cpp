@@ -4467,16 +4467,16 @@ int8_t SX1272::getPacket(uint16_t wait)
             // Print the packet if debug_mode
 #if (SX1272_debug_mode > 0)
             Serial.println("## Packet received:");
-            printf(F("Destination: "));		
-            printf(F("Type: "));
+            printf("Destination: );		
+            printf("Type: ");
             Serial.println(packet_received.type);			 	// Printing source
-            printf(F("Source: "));
+            printf("Source: ");
             Serial.println(packet_received.src);			 	// Printing source
-            printf(F("Packet number: "));
+            printf("Packet number: ");
             Serial.println(packet_received.packnum);			// Printing packet number
             //printf(F("Packet length: "));
             //Serial.println(packet_received.length);			// Printing packet length
-            printf(F("Data: "));
+            printf("Data: ");
             for(unsigned int i = 0; i < _payloadlength; i++)
             {
                 printf((char)packet_received.data[i]);		// Printing payload
@@ -4525,7 +4525,7 @@ int8_t SX1272::getPacket(uint16_t wait)
     {
         state = -1;
 #if (SX1272_debug_mode > 0)
-        Serial.println("** The timeout must be smaller than 12.5 seconds **);
+        Serial.println("** The timeout must be smaller than 12.5 seconds **");
         Serial.println("");
 #endif
     }
