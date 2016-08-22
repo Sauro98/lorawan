@@ -5345,7 +5345,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload)
 
 #if (SX1272_debug_mode > 1)
 	Serial.println("");
-	Serial.println(F("Starting 'sendPacketTimeout'"));
+	Serial.println("Starting 'sendPacketTimeout'");
 #endif
 
 	state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
@@ -5375,7 +5375,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t lengt
 
 #if (SX1272_debug_mode > 1)
 	Serial.println("");
-	Serial.println(F("Starting 'sendPacketTimeout'"));
+	Serial.println("Starting 'sendPacketTimeout'");
 #endif
 
 	state = truncPayload(length16);
@@ -5410,7 +5410,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload, uint16_t wait)
 	}
 #if (SX1272_debug_mode > 1)
 	Serial.println("");
-	Serial.println(F("Starting 'sendPacketTimeout'"));
+	Serial.println("Starting 'sendPacketTimeout'");
 #endif
 
 	state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
@@ -5439,7 +5439,7 @@ uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t lengt
 	}
 #if (SX1272_debug_mode > 1)
 	Serial.println("");
-	Serial.println(F("Starting 'sendPacketTimeout'"));
+	Serial.println("Starting 'sendPacketTimeout'");
 #endif
 
 	state = truncPayload(length16);
