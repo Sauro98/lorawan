@@ -5759,171 +5759,148 @@ void SX1272::setType(uint8_t type) {
 //Modificato da Ivano 18/08/2016
 uint8_t SX1272::getACK(uint16_t wait)
 {
-    uint8_t state = 2;
-    byte value = 0x00;
-    unsigned long previous;
-    boolean a_received = false;
+	uint8_t state = 2;
+	byte value = 0x00;
+	unsigned long previous;
+	boolean a_received = false;
 
-    //#if (SX1272_debug_mode > 1)
-    printf("\n");
-    Serial.println("Starting 'getACK'");
-    //#endif
+	//#if (SX1272_debug_mode > 1)
+	Serial.println();
+	Serial.println(F("Starting 'getACK'"));
+	//#endif
 
-    previous = millis();
+	previous = millis();
 
-    if( _modem == LORA )
-    { // LoRa mode
-        value = readRegister(REG_IRQ_FLAGS);
-        // Wait until the ACK is received (RxDone flag) or the timeout expires
-        while ((bitRead(value, 6) == 0) && (millis() - previous < wait))
-        {
-            value = readRegister(REG_IRQ_FLAGS);
-            if( millis() < previous )
-            {
-                previous = millis();
-            }
-        }
-        if( bitRead(value, 6) == 1 )
-        { // ACK received
-            // comment by C. Pham
-            // not really safe because the received packet may not be an ACK
-            // probability is low if using unicast to gateway, but if broadcast
-            // can get a packet from another node!!
-            a_received = true;
-        }
-        // Standby para minimizar el consumo
-        writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Setting standby LoRa mode
-    }
-    else
-    { // FSK mode
-        value = readRegister(REG_IRQ_FLAGS2);
-        // Wait until the packet is received (RxDone flag) or the timeout expires
-        while ((bitRead(value, 2) == 0) && (millis() - previous < wait))
-        {
-            value = readRegister(REG_IRQ_FLAGS2);
-            if( millis() < previous )
-            {
-                previous = millis();
-            }
-        }
-        if( bitRead(value, 2) == 1 )
-        { // ACK received
-            a_received = true;
-        }
-        // Standby para minimizar el consumo
-        writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Setting standby FSK mode
-    }
+	if (_modem == LORA)
+	{ // LoRa mode
+		value = readRegister(REG_IRQ_FLAGS);
+		// Wait until the ACK is received (RxDone flag) or the timeout expires
+		while ((bitRead(value, 6) == 0) && (millis() - previous < wait))
+		{
+			value = readRegister(REG_IRQ_FLAGS);
+			if (millis() < previous)
+			{
+				previous = millis();
+			}
+		}
+		if (bitRead(value, 6) == 1)
+		{ // ACK received
+		  // comment by C. Pham
+		  // not really safe because the received packet may not be an ACK
+		  // probability is low if using unicast to gateway, but if broadcast
+		  // can get a packet from another node!!
+			a_received = true;
+		}
+		// Standby para minimizar el consumo
+		writeRegister(REG_OP_MODE, LORA_STANDBY_MODE);	// Setting standby LoRa mode
+	}
+	else
+	{ // FSK mode
+		value = readRegister(REG_IRQ_FLAGS2);
+		// Wait until the packet is received (RxDone flag) or the timeout expires
+		while ((bitRead(value, 2) == 0) && (millis() - previous < wait))
+		{
+			value = readRegister(REG_IRQ_FLAGS2);
+			if (millis() < previous)
+			{
+				previous = millis();
+			}
+		}
+		if (bitRead(value, 2) == 1)
+		{ // ACK received
+			a_received = true;
+		}
+		// Standby para minimizar el consumo
+		writeRegister(REG_OP_MODE, FSK_STANDBY_MODE);	// Setting standby FSK mode
+	}
 
-    // comment by C. Pham
-    // not safe because the received packet may not be an ACK!
-    if( a_received )
-    {
-        // Storing the received ACK
-        ACK.type = readRegister(REG_FIFO);
-        ACK.src = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) << 24 ;
+	// comment by C. Pham
+	// not safe because the received packet may not be an ACK!
+	if (a_received)
+	{
+		writeRegister(REG_FIFO_ADDR_PTR, 0x00);
+		// Storing the received ACK
+		ACK.type = readRegister(REG_FIFO);
+		ACK.src = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) << 24;
 		ACK.fCtrl = readRegister(REG_FIFO);
-        ACK.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8;
+		ACK.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8;
 		ACK.fPort = readRegister(REG_FIFO);
-        ACK.data[0] = readRegister(REG_FIFO);
-        ACK.data[1] = readRegister(REG_FIFO);
+		ACK.data[0] = readRegister(REG_FIFO);
+		ACK.data[1] = readRegister(REG_FIFO);
+		if (ACK.fCtrl == PKT_FCTRL_ACK) {
 
-        if (ACK.fCtrl == PKT_FCTRL_ACK) {
+			// Checking the received ACK
+			if (MID(ACK.src, 25, 32) == NETWORK_ID)
+			{
 
-            // Checking the received ACK
-            if( ACK.src & NETWORK_ID)
-            {
-                if( ACK.src >> 7 & NETWORK_ADDRESS  )
-                {
-                    if( ACK.packnum == packet_sent.packnum )
-                    {
-                        
-                            if( ACK.data[0] == CORRECT_PACKET )
-                            {
-                                state = 0;
-                                //#if (SX1272_debug_mode > 0)
-                                // Printing the received ACK
-                                Serial.println("## ACK received:");
-                                printf("Type: ");
-                                Serial.println(ACK.type);			 	// Printing destination
-                                printf("Source: ");
-                                Serial.println(ACK.src);			 	// Printing source
-                                printf("ACK number: ");
-                                Serial.println(ACK.packnum);			// Printing ACK number
-                                printf("ACK fCtrl: ");
-                                Serial.println(ACK.fCtrl);				// Printing ACK fctrl
-								printf("ACK fPort: ");
-								Serial.println(ACK.fPort);              // Printing ACK fport
-                                printf("ACK payload: ");
-                                Serial.println(ACK.data[0]);			// Printing ACK payload
-                                printf("ACK SNR of rcv pkt at gw: ");
+				if (ACK.packnum == packet_sent.packnum)
+				{
 
-                                value = ACK.data[1];
+					if (ACK.data[0] == CORRECT_PACKET)
+					{
+						state = 0;
+						//#if (SX1272_debug_mode > 0)
+						// Printing the received ACK
+						Serial.println(F("## ACK received:"));
+						value = ACK.data[1];
 
-                                if( value & 0x80 ) // The SNR sign bit is 1
-                                {
-                                    // Invert and divide by 4
-                                    value = ( ( ~value + 1 ) & 0xFF ) >> 2;
-                                    _rcv_snr_in_ack = -value;
-                                }
-                                else
-                                {
-                                    // Divide by 4
-                                    _rcv_snr_in_ack = ( value & 0xFF ) >> 2;
-                                }
+						if (value & 0x80) // The SNR sign bit is 1
+						{
+							// Invert and divide by 4
+							value = ((~value + 1) & 0xFF) >> 2;
+							_rcv_snr_in_ack = -value;
+						}
+						else
+						{
+							// Divide by 4
+							_rcv_snr_in_ack = (value & 0xFF) >> 2;
+						}
 
-                                Serial.println(_rcv_snr_in_ack);
-                                Serial.println("##");
-                                Serial.println("");
-                                //#endif
-                            }
-                            else
-                            {
-                                state = 1;
-                                //#if (SX1272_debug_mode > 0)
-                                Serial.println("** N-ACK received **");
-                                Serial.println("");
-                                //#endif
-                            }
-                        
-                    }
-                    else
-                    {
-                        state = 1;
-                        //#if (SX1272_debug_mode > 0)
-                        Serial.println("** ACK number incorrectly received **");
-                        Serial.println("");
-                        //#endif
-                    }
-                }
-                else
-                {
-                    state = 1;
-                    //#if (SX1272_debug_mode > 0)
-                    Serial.println("** ACK source incorrectly received **");
-                    Serial.println("");
-                    //#endif
-                }
-            }
-        }
-        else
-        {
-            state = 1;
-            //#if (SX1272_debug_mode > 0)
-            Serial.println("** ACK destination incorrectly received **");
-            Serial.println("");
-            //#endif
-        }
-    }
-    else
-    {
-        state = 1;
-        //#if (SX1272_debug_mode > 0)
-        Serial.println("** ACK lost **");
-        Serial.println("");
-        //#endif
-    }
-    clearFlags();	// Initializing flags
-    return state;
+						Serial.println(_rcv_snr_in_ack);
+						Serial.println(F("##"));
+						Serial.println();
+						//#endif
+					}
+					else
+					{
+						state = 1;
+						//#if (SX1272_debug_mode > 0)
+						Serial.println(F("** N-ACK received **"));
+						Serial.println();
+						//#endif
+					}
+
+				}
+				else
+				{
+					state = 1;
+					//#if (SX1272_debug_mode > 0)
+					Serial.println(F("** ACK number incorrectly received **"));
+					Serial.println();
+					//#endif
+				}
+
+			}
+		}
+		else
+		{
+			state = 1;
+			//#if (SX1272_debug_mode > 0)
+			Serial.println(F("** Not an ack **"));
+			Serial.println();
+			//#endif
+		}
+	}
+	else
+	{
+		state = 1;
+		//#if (SX1272_debug_mode > 0)
+		Serial.println(F("** ACK lost **"));
+		Serial.println();
+		//#endif
+	}
+	clearFlags();	// Initializing flags
+	return state;
 }
 
 //**********************************************************************/

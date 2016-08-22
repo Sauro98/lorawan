@@ -1108,7 +1108,7 @@ void loop(void)
                 i++;
                 cmdValue=getCmdValue(i);
   
-                if (cmdValue==UNLOCK_PIN) {
+                /*if (cmdValue==UNLOCK_PIN) {
                   
                   unlocked=!unlocked;
                   
@@ -1118,7 +1118,7 @@ void loop(void)
                     PRINT_CSTSTR("%s","^$Locked\n");
                 }
                 else
-                  unlocked_try--;
+                  unlocked_try--;*/
                   
                 if (unlocked_try==0)
                   PRINT_CSTSTR("%s","^$Bad pin\n");
@@ -1495,7 +1495,7 @@ void loop(void)
       // to test with appkey + encrypted
       //sx1272.setPacketType(PKT_TYPE_DATA | PKT_FLAG_DATA_WAPPKEY | PKT_FLAG_DATA_ENCRYPTED);
       
-      sx1272.setPacketType(PKT_TYPE_DATA); 
+      //sx1272.setPacketType(PKT_TYPE_DATA); 
         
       if (forTmpDestAddr>=0) {
         if (withAck)
