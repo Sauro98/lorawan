@@ -5523,7 +5523,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload)
 	if (state == 0)
 	{
 		// added by C. Pham
-		Serial.println(F("wait for ACK"));
+		Serial.println("wait for ACK");
 
 		if (availableData())
 		{
@@ -5533,7 +5533,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload)
 		{
 			state_f = 3;
 			// added by C. Pham
-			Serial.println(F("no ACK"));
+			Serial.println("no ACK");
 		}
 		}
 	else
