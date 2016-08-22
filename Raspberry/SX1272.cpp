@@ -4467,7 +4467,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             // Print the packet if debug_mode
 #if (SX1272_debug_mode > 0)
             Serial.println("## Packet received:");
-            printf("Destination: );		
+            printf("Destination: ");		
             printf("Type: ");
             Serial.println(packet_received.type);			 	// Printing source
             printf("Source: ");
@@ -4479,7 +4479,7 @@ int8_t SX1272::getPacket(uint16_t wait)
             printf("Data: ");
             for(unsigned int i = 0; i < _payloadlength; i++)
             {
-                printf((char)packet_received.data[i]);		// Printing payload
+                printf("%c \n",(char)packet_received.data[i]);		// Printing payload
             }
             Serial.println("");
             //printf(F("Retry number: "));
