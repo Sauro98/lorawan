@@ -5765,8 +5765,8 @@ uint8_t SX1272::getACK(uint16_t wait)
 	boolean a_received = false;
 
 	//#if (SX1272_debug_mode > 1)
-	Serial.println();
-	Serial.println(F("Starting 'getACK'"));
+	Serial.println("");
+	Serial.println("Starting 'getACK'");
 	//#endif
 
 	previous = millis();
@@ -5841,7 +5841,7 @@ uint8_t SX1272::getACK(uint16_t wait)
 						state = 0;
 						//#if (SX1272_debug_mode > 0)
 						// Printing the received ACK
-						Serial.println(F("## ACK received:"));
+						Serial.println("## ACK received:");
 						value = ACK.data[1];
 
 						if (value & 0x80) // The SNR sign bit is 1
@@ -5857,16 +5857,16 @@ uint8_t SX1272::getACK(uint16_t wait)
 						}
 
 						Serial.println(_rcv_snr_in_ack);
-						Serial.println(F("##"));
-						Serial.println();
+						Serial.println("##");
+						Serial.println("");
 						//#endif
 					}
 					else
 					{
 						state = 1;
 						//#if (SX1272_debug_mode > 0)
-						Serial.println(F("** N-ACK received **"));
-						Serial.println();
+						Serial.println("** N-ACK received **");
+						Serial.println("");
 						//#endif
 					}
 
@@ -5875,8 +5875,8 @@ uint8_t SX1272::getACK(uint16_t wait)
 				{
 					state = 1;
 					//#if (SX1272_debug_mode > 0)
-					Serial.println(F("** ACK number incorrectly received **"));
-					Serial.println();
+					Serial.println("** ACK number incorrectly received **");
+					Serial.println("");
 					//#endif
 				}
 
@@ -5886,8 +5886,8 @@ uint8_t SX1272::getACK(uint16_t wait)
 		{
 			state = 1;
 			//#if (SX1272_debug_mode > 0)
-			Serial.println(F("** Not an ack **"));
-			Serial.println();
+			Serial.println("** Not an ack **");
+			Serial.println("");
 			//#endif
 		}
 	}
