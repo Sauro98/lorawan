@@ -362,35 +362,70 @@ struct pack
 	uint8_t netkey[NET_KEY_LENGTH];
 #endif
 
-	//Aggiunta da Ivano 18/08/2016
-	// type 01000000 - 0x40 non richiedere ack
-	// type 10000000 - 0x80 richiedi ack
-	uint8_t type;
+	//----------STRUTTURA ORDINATA DEL PACCHETTO----------//
 
-	//Aggiunta da Ivano 18/08/2016
-	// I primi sette bit identificano il network, mentre i sucessivi 25 identificano il dispositivo
+	//-----MAC Header-----//
+	//!Aggiunta da Ivano 18/08/2016
+	/*
+	type 01000000 - 0x40 non richiedere ack  - PKT_TYPE_NO_ACK
+	type 10000000 - 0x80 richiedi ack        - PKT_TYPE_REQUEST_ACK
+	type rappresenta nel protocollo LoRaWAN il MHDR - MAC header del pacchetto
+	*/
+	uint8_t type;
+	//-----MAC Header-----//
+
+	//-----MAC Payload-----//
+
+	//--FHDR--//
+	//!Aggiunta da Ivano 18/08/2016
+	/*!
+	I primi sette bit identificano il network, mentre i sucessivi 25 identificano il dispositivo
+	packet.src = NETWORK_ID <<25 | NETWORK_ADDRESS
+	src rappresenta nel protocollo LoRaWAN il DevAddress contenuto nel FHDR
+	*/
 	uint32_t src;
 
-	//Aggiunta da Ivano 18/08/2016
-	// due byte di contatore di pacchetto
-	uint16_t packnum;
+	//! Aggiunta da Ivano 18/08/2016
+	/*!
+	fCtrl 00000000 - 0x00 messaggio contenete dati - PKT_FCTRL_DATA
+	fCtrl 00100000 - 0x20 messaggio ack            - PKT_FCTRL_ACK
+	fCtrl rappresenta nel protocollo LoRaWAN l' fCtrl contenuto nel FHDR
+	*/
+	uint8_t fCtrl;
 
+	//!Aggiunta da Ivano 18/08/2016
+	/*! 
+	due byte di contatore di pacchetto
+	packnum rappresenta nel protocollo LoRaWAN l'fCount contenuto nel FHDR
+	*/
+	uint16_t packnum;
+	//--FHDR--//
+
+	//--FPORT--//
+	//!Aggiunta da Ivano 18/08/2016
+	/*!
+	porta arbitraria da 1 a 223, ho sceto 10 - F_PORT
+	fPort rappresenta nel protocollo LoRaWAN l'fPort nel MAC payload
+	*/
+	uint8_t fPort;
+	//--FPORT--//
+
+	//--PAYLOAD--//
 	//! Structure Variable : Packet payload
 	/*!
 	*/
 	uint8_t data[MAX_PAYLOAD];
+	//--PAYLOAD--//
 
-	//Aggiunta da Ivano 18/08/2016
-	// fCtrl 00000000 - 0x00 messaggio contenete dati
-	// fCtrl 00100000 - 0x20 messaggio ack 
-	uint8_t fCtrl;
+	//-----MAC Payload-----//
 
-	//Aggiunta da Ivano 18/08/2016
-	//porta arbitraria da 1 a 223, ho sceto 10
-	uint8_t fPort;
+	//---------STRUTTURA ORDINATA DEL PACCHETTO----------//
 
-	//Riaggiunta da Ivano 19/08/2016
-	//serve solo in ricezione
+
+	//! Riaggiunta da Ivano 19 / 08 / 2016
+	/*!
+	serve solo in ricezione per l'iterazione col vettore data
+	*/
 	uint8_t length;
 
 };
@@ -1156,10 +1191,23 @@ public:
 
 
 
-	//Added by Ivano 19/06/2016
-	void setPacketFctrl(uint8_t);
-	//Added by Ivano 19/06/2016
-	void setType(uint8_t);
+	//!Added by Ivano 19/08/2016
+	/*!
+	\function : sets the type of the new packet - In the LoRaWAN protocol this is the MHDR - MAC header
+	\param type : the type of the packet
+	- PKT_TYPE_REQUEST_ACK : when the packet is received the receiver will respond with an ack message
+	- PKT_TYPE_NO_ACK      : when the packet is received the receiver will not send an ack message back
+	*/
+	void setType(uint8_t type);
+
+	//!Added by Ivano 19/08/2016
+	/*!
+	\function : set the fCtrl of the FHDR of the packet
+	\param type : the fCtrl of the packet
+	- PKT_FCTRL_DATA : the packet is a data packet
+	- PKT_FCTRL_ACK  : the packet is an ack packet
+	*/
+	void setPacketFctrl(uint8_t type);
 
 
 

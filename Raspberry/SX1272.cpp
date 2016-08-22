@@ -5101,9 +5101,9 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 	int8_t state = 2;
 
 
-	packet_sent.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
-	packet_sent.packnum = _packetNumber;
-	setPayload(payload);
+
+
+
 #if (SX1272_debug_mode > 1)
 	Serial.println("");
 	Serial.println("Starting 'setPacket'");
@@ -5122,11 +5122,28 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 
 	_reception = CORRECT_PACKET;	// Updating incorrect value
 
+	//-----SETTING DEL PACCHETTO-----//
+	//MAC HEADER//
+		//type viene settato prima nelle funzioni sendPacket
+	//MAC HEADER//
+	//MAC PAYLOAD//
+		//--FHDR--//
+			//DevAddress
+			packet_sent.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
+			//Fctrl
+			packet_sent.fCtrl = PKT_FCTRL_DATA; // è un pacchetto di dati	
+			packet_sent.packnum = _packetNumber;//Fcount
+			//Non servono i byte per Fopt
+		//--FHDR--//
+		//--FPORT--//
+			packet_sent.fPort = F_PORT;
+		//--FPORT--//
+		//--Payload--//
+			setPayload(payload);
+		//--Payload--//
+	//MAC PAYLOAD//
+	//MIC (MESSAGE INTEGRITY CHECK) non ancora implementato
 
-
-
-	packet_sent.fCtrl = PKT_FCTRL_DATA;
-	packet_sent.fPort = F_PORT;
 	//Hardcoded state 0 by Ivano 18/08/2016 Non setto più la destinazione perciò lo stato lo metto a 0 manualmente
 	state = 0;
 	writeRegister(REG_FIFO_ADDR_PTR, 0x80);  // Setting address pointer in FIFO data buffer
@@ -5156,42 +5173,16 @@ uint8_t SX1272::setPacket(uint8_t dest, uint8_t *payload)
 			writeRegister(REG_FIFO, MID(packet_sent.packnum, (8 * a), (8 * (a + 1))));  //2 byte di packnum
 		}
 		writeRegister(REG_PAYLOAD_LENGTH_LORA, _payloadlength + 1/*fctrl*/ + 4/*src*/ + 1 /*type*/ + 2 /*packnum*/ + 1/*fPort*/);
-		printf("pl length : %d \n", _payloadlength);
 		// Storing payload length in LoRa mode
 		writeRegister(REG_FIFO, packet_sent.fPort);                                          // porta
 		for (unsigned int i = 0; i < _payloadlength; i++)
 		{
-			printf("Writing payload : %d\n", packet_sent.data[i]);
 			writeRegister(REG_FIFO, packet_sent.data[i]);  // Writing the payload in FIFO
 		}
 		// commented by C. Pham
 		//writeRegister(REG_FIFO, packet_sent.retry);		// Writing the number retry in FIFO
 		state = 0;
 
-#if (SX1272_debug_mode > 0)
-		/*Serial.println(F("## Packet set and written in FIFO ##"));
-		// Print the complete packet if debug_mode
-		Serial.println(F("## Packet to send: "));
-		Serial.print(F("Destination: "));
-		Serial.println(packet_sent.dst);			 	// Printing destination
-		Serial.print(F("Packet type: "));
-		Serial.println(packet_sent.type);			// Printing packet type
-		Serial.print(F("Source: "));
-		Serial.println(packet_sent.src);			 	// Printing source
-		Serial.print(F("Packet number: "));
-		Serial.println(packet_sent.packnum);			// Printing packet number
-		Serial.print(F("Packet length: "));
-		Serial.println(packet_sent.length);			// Printing packet length
-		Serial.print(F("Data: "));
-		for(unsigned int i = 0; i < _payloadlength; i++)
-		{
-		Serial.print((char)packet_sent.data[i]);		// Printing payload
-		}
-		Serial.println();
-		//Serial.print(F("Retry number: "));
-		//Serial.println(packet_sent.retry);			// Printing retry number
-		Serial.println(F("##"));*/
-#endif
 	}
 
 	return state;
@@ -5313,382 +5304,436 @@ uint8_t SX1272::sendWithTimeout(uint16_t wait)
 }
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketMAXTimeout(uint8_t dest, char *payload)
 {
-    return sendPacketTimeout(dest, payload, MAX_TIMEOUT);
+	return sendPacketTimeout(dest, payload, MAX_TIMEOUT);
 }
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
-uint8_t SX1272::sendPacketMAXTimeout(uint8_t dest,  uint8_t *payload, uint16_t length16)
+uint8_t SX1272::sendPacketMAXTimeout(uint8_t dest, uint8_t *payload, uint16_t length16)
 {
-    return sendPacketTimeout(dest, payload, length16, MAX_TIMEOUT);
+	return sendPacketTimeout(dest, payload, length16, MAX_TIMEOUT);
 }
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload)
 {
-    uint8_t state = 2;
+	//Added by Ivano 22/08/2016
+	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
+		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+	}
+
+	uint8_t state = 2;
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeout'\n");
+	Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
-    state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
-    if (state == 0)								// and writing it in FIFO.
-    {
-        state = sendWithTimeout();	// Sending the packet
-    }
-    return state;
-}
+	state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
+	if (state == 0)								// and writing it in FIFO.
+	{
+		state = sendWithTimeout();	// Sending the packet
+	}
+	return state;
+	}
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t length16)
 {
-    uint8_t state = 2;
-    uint8_t state_f = 2;
+	uint8_t state = 2;
+	uint8_t state_f = 2;
+
+	//Added by Ivano 22/08/2016
+	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
+		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+	}
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeout'\n");
+	Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
-    state = truncPayload(length16);
-    if( state == 0 )
-    {
-        state_f = setPacket(dest, payload);	// Setting a packet with 'dest' destination
-    }												// and writing it in FIFO.
-    else
-    {
-        state_f = state;
-    }
-    if( state_f == 0 )
-    {
-        state_f = sendWithTimeout();	// Sending the packet
-    }
-    return state_f;
+	state = truncPayload(length16);
+	if (state == 0)
+	{
+		state_f = setPacket(dest, payload);	// Setting a packet with 'dest' destination
+	}												// and writing it in FIFO.
+	else
+	{
+		state_f = state;
+	}
+	if (state_f == 0)
+	{
+		state_f = sendWithTimeout();	// Sending the packet
+	}
+	return state_f;
 }
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeout(uint8_t dest, char *payload, uint16_t wait)
 {
-    uint8_t state = 2;
-
+	uint8_t state = 2;
+	//Added by Ivano 22/08/2016
+	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
+		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+	}
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeout'\n");
+	Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
-    state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
-    if (state == 0)								// and writing it in FIFO.
-    {
-        state = sendWithTimeout(wait);	// Sending the packet
-    }
-    return state;
+	state = setPacket(dest, payload);	// Setting a packet with 'dest' destination
+	if (state == 0)								// and writing it in FIFO.
+	{
+		state = sendWithTimeout(wait);	// Sending the packet
+	}
+	return state;
 }
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeout(uint8_t dest, uint8_t *payload, uint16_t length16, uint16_t wait)
 {
-    uint8_t state = 2;
-    uint8_t state_f = 2;
-
+	uint8_t state = 2;
+	uint8_t state_f = 2;
+	_payloadlength = length16;
+	//Added by Ivano 22/08/2016
+	if (packet_sent.type != PKT_TYPE_REQUEST_ACK) {
+		packet_sent.type = PKT_TYPE_NO_ACK //Not requesting ACK here
+	}
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeout'\n");
+	Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeout'"));
 #endif
 
-    state = truncPayload(length16);
-    if( state == 0 )
-    {
-        state_f = setPacket(dest, payload);	// Setting a packet with 'dest' destination
-    }
-    else
-    {
-        state_f = state;
-    }
-    if( state_f == 0 )								// and writing it in FIFO.
-    {
-        state_f = sendWithTimeout(wait);	// Sending the packet
-    }
-    return state_f;
+	state = truncPayload(length16);
+
+
+	if (state == 0)
+	{
+		state_f = setPacket(dest, payload);	// Setting a packet with 'dest' destination
+
+	}
+	else
+	{
+		state_f = state;
+	}
+	if (state_f == 0)								// and writing it in FIFO.
+	{
+		state_f = sendWithTimeout(wait);	// Sending the packet
+	}
+	return state_f;
 }
 
 /*
- Function: Configures the module to transmit information.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketMAXTimeoutACK(uint8_t dest, char *payload)
 {
-    return sendPacketTimeoutACK(dest, payload, MAX_TIMEOUT);
+	return sendPacketTimeoutACK(dest, payload, MAX_TIMEOUT);
 }
 
 /*
- Function: Configures the module to transmit information and receive an ACK.
- Returns: Integer that determines if there has been any error
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information and receive an ACK.
+Returns: Integer that determines if there has been any error
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketMAXTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t length16)
 {
-    return sendPacketTimeoutACK(dest, payload, length16, MAX_TIMEOUT);
+	return sendPacketTimeoutACK(dest, payload, length16, MAX_TIMEOUT);
 }
 
 /*
- Function: Configures the module to transmit information and receive an ACK.
- Returns: Integer that determines if there has been any error
-   state = 3  --> Packet has been sent but ACK has not been received
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information and receive an ACK.
+Returns: Integer that determines if there has been any error
+state = 3  --> Packet has been sent but ACK has not been received
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload)
 {
-    uint8_t state = 2;
-    uint8_t state_f = 2;
+	uint8_t state = 2;
+	uint8_t state_f = 2;
+	//Added by Ivano 22/08/2016
+	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
+
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACK'\n");
+		Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
 #endif
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 1;
+	_requestACK = 1;
 #endif
 
-    state = sendPacketTimeout(dest, payload);	// Sending packet to 'dest' destination
+	state = sendPacketTimeout(dest, payload);	// Sending packet to 'dest' destination
 
-    if( state == 0 )
-    {
-        state = receive();	// Setting Rx mode to wait an ACK
-    }
-    else
-    {
-        state_f = state;
-    }
-    if( state == 0 )
-    {
-        if( availableData() )
-        {
-            state_f = getACK();	// Getting ACK
-        }
-        else
-        {
-            state_f = 3;
-        }
-    }
-    else
-    {
-        state_f = state;
-    }
+	if (state == 0)
+	{
+		state = receive();	// Setting Rx mode to wait an ACK
+	}
+	else
+	{
+		state_f = state;
+	}
+	if (state == 0)
+	{
+		// added by C. Pham
+		Serial.println(F("wait for ACK"));
+
+		if (availableData())
+		{
+			state_f = getACK();	// Getting ACK
+		}
+		else
+		{
+			state_f = 3;
+			// added by C. Pham
+			Serial.println(F("no ACK"));
+		}
+		}
+	else
+	{
+		state_f = state;
+	}
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 0;
+	_requestACK = 0;
 #endif
-    return state_f;
-}
+	return state_f;
+	}
 
 /*
- Function: Configures the module to transmit information and receive an ACK.
- Returns: Integer that determines if there has been any error
-   state = 3  --> Packet has been sent but ACK has not been received
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information and receive an ACK.
+Returns: Integer that determines if there has been any error
+state = 3  --> Packet has been sent but ACK has not been received
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t length16)
 {
-    uint8_t state = 2;
-    uint8_t state_f = 2;
+	uint8_t state = 2;
+	uint8_t state_f = 2;
 
+	//Added by Ivano 22/08/2016
+	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACK'\n");
+		Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
 #endif
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 1;
+	_requestACK = 1;
 #endif
-    // Sending packet to 'dest' destination
-    state = sendPacketTimeout(dest, payload, length16);
+	// Sending packet to 'dest' destination
+	state = sendPacketTimeout(dest, payload, length16);
 
-    // Trying to receive the ACK
-    if( state == 0 )
-    {
-        state = receive();	// Setting Rx mode to wait an ACK
-    }
-    else
-    {
-        state_f = state;
-    }
-    if( state == 0 )
-    {
-        if( availableData() )
-        {
-            state_f = getACK();	// Getting ACK
-        }
-        else
-        {
-            state_f = 3;
-        }
-    }
-    else
-    {
-        state_f = state;
-    }
+	// Trying to receive the ACK
+	if (state == 0)
+	{
+		state = receive();	// Setting Rx mode to wait an ACK
+	}
+	else
+	{
+		state_f = state;
+	}
+	if (state == 0)
+	{
+		if (availableData())
+		{
+			state_f = getACK();	// Getting ACK
+		}
+		else
+		{
+			state_f = 3;
+		}
+	}
+	else
+	{
+		state_f = state;
+	}
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 0;
+	_requestACK = 0;
 #endif
-    return state_f;
+	return state_f;
 }
 
 /*
- Function: Configures the module to transmit information and receive an ACK.
- Returns: Integer that determines if there has been any error
-   state = 3  --> Packet has been sent but ACK has not been received
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information and receive an ACK.
+Returns: Integer that determines if there has been any error
+state = 3  --> Packet has been sent but ACK has not been received
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, char *payload, uint16_t wait)
 {
-    uint8_t state = 2;
-    uint8_t state_f = 2;
+	uint8_t state = 2;
+	uint8_t state_f = 2;
+
+	//Added by Ivano 22/08/2016
+	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACK'\n");
+		Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
 #endif
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 1;
+	_requestACK = 1;
 #endif
+	state = sendPacketTimeout(dest, payload, wait);	// Sending packet to 'dest' destination
 
-    state = sendPacketTimeout(dest, payload, wait);	// Sending packet to 'dest' destination
+	if (state == 0)
+	{
+		state = receive();	// Setting Rx mode to wait an ACK
+	}
+	else
+	{
+		state_f = 1;
+	}
+	if (state == 0)
+	{
+		// added by C. Pham
+		Serial.println(F("wait for ACK"));
 
-    if( state == 0 )
-    {
-        state = receive();	// Setting Rx mode to wait an ACK
-    }
-    else
-    {
-        state_f = 1;
-    }
-    if( state == 0 )
-    {
-        if( availableData() )
-        {
-            state_f = getACK();	// Getting ACK
-        }
-        else
-        {
-            state_f = 3;
-        }
-    }
-    else
-    {
-        state_f = 1;
-    }
+		if (availableData())
+		{
+			state_f = getACK();	// Getting ACK
+		}
+		else
+		{
+			state_f = 3;
+			// added by C. Pham
+			Serial.println(F("no ACK"));
+		}
+	}
+	else
+	{
+		state_f = 1;
+	}
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 0;
+	_requestACK = 0;
 #endif
-    return state_f;
+	return state_f;
+}
+
+
+//Added by Ivano 19/08/2016 set packet type
+
+void SX1272::setType(uint8_t type) {
+	packet_sent.type = type;
 }
 
 /*
- Function: Configures the module to transmit information and receive an ACK.
- Returns: Integer that determines if there has been any error
-   state = 3  --> Packet has been sent but ACK has not been received
-   state = 2  --> The command has not been executed
-   state = 1  --> There has been an error while executing the command
-   state = 0  --> The command has been executed with no errors
+Function: Configures the module to transmit information and receive an ACK.
+Returns: Integer that determines if there has been any error
+state = 3  --> Packet has been sent but ACK has not been received
+state = 2  --> The command has not been executed
+state = 1  --> There has been an error while executing the command
+state = 0  --> The command has been executed with no errors
 */
 uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t length16, uint16_t wait)
 {
-    uint8_t state = 2;
-    uint8_t state_f = 2;
+	uint8_t state = 2;
+	uint8_t state_f = 2;
+	_payloadlength = length16;
+
+	//Added by Ivano 22/08/2016
+	packet_sent.type = PKT_TYPE_REQUEST_ACK //Requesting ACK here
 
 #if (SX1272_debug_mode > 1)
-    printf("\n");
-    printf("Starting 'sendPacketTimeoutACK'\n");
+		Serial.println();
+	Serial.println(F("Starting 'sendPacketTimeoutACK'"));
 #endif
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 1;
+	_requestACK = 1;
 #endif
+	//Aggiunto da Ivano 19/08/2016
+	packet_sent.type = PKT_TYPE_REQUEST_ACK;
 
-    state = sendPacketTimeout(dest, payload, length16, wait);	// Sending packet to 'dest' destination
+	state = sendPacketTimeout(dest, payload, length16, wait);	// Sending packet to 'dest' destination
 
-    if( state == 0 )
-    {
-        state = receive();	// Setting Rx mode to wait an ACK
-    }
-    else
-    {
-        state_f = 1;
-    }
-    if( state == 0 )
-    {
-        if( availableData() )
-        {
-            state_f = getACK();	// Getting ACK
-        }
-        else
-        {
-            state_f = 3;
-        }
-    }
-    else
-    {
-        state_f = 1;
-    }
+	if (state == 0)
+	{
+		state = receive();	// Setting Rx mode to wait an ACK
+	}
+	else
+	{
+		state_f = 1;
+	}
+	if (state == 0)
+	{
+		// added by C. Pham
+
+		if (availableData())
+		{
+			state_f = getACK();	// Getting ACK
+		}
+		else
+		{
+			state_f = 3;
+			// added by C. Pham
+			Serial.println(F("no ACK"));
+		}
+	}
+	else
+	{
+		state_f = 1;
+	}
 
 #ifdef W_REQUESTED_ACK
-    _requestACK = 0;
+	_requestACK = 0;
 #endif
-    return state_f;
+	return state_f;
 }
 
 /*
