@@ -230,11 +230,11 @@
 #endif
   
 //#define RECEIVE_ALL 
-  #define IS_RCV_GATEWAY
-//#define IS_SEND_GATEWAY
+ //#define IS_RCV_GATEWAY
+#define IS_SEND_GATEWAY
 //#define CAD_TEST
 //#define LORA_LAS
-//#define WINPUT
+#define WINPUT
 //#define WITH_SEND_LED
 
 // the special mode to test BW=125MHz, CR=4/5, SF=12
