@@ -5895,8 +5895,8 @@ uint8_t SX1272::getACK(uint16_t wait)
 	{
 		state = 1;
 		//#if (SX1272_debug_mode > 0)
-		Serial.println(F("** ACK lost **"));
-		Serial.println();
+		Serial.println("** ACK lost **");
+		Serial.println("");
 		//#endif
 	}
 	clearFlags();	// Initializing flags
