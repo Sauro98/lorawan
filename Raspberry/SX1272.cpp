@@ -4134,7 +4134,6 @@ boolean	SX1272::availableData(uint16_t wait)
         } // end while (millis)
         if( bitRead(value, 4) == 1 )
         { // header received
-			printf("## Valid Header received in LoRa mode ##\n");
 #if (SX1272_debug_mode > 0)
             printf("## Valid Header received in LoRa mode ##\n");
 #endif
@@ -4169,7 +4168,6 @@ boolean	SX1272::availableData(uint16_t wait)
 				//this is actually the source now
 				readRegister(REG_FIFO);//skip type
                 _destination = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 | readRegister(REG_FIFO) << 16 | readRegister(REG_FIFO) <<24;
-				printf("destination %04x \n", _destination);
             }
         }
         else
