@@ -896,7 +896,7 @@ void loop(void)
 #else
 #ifdef GW_AUTO_ACK  
 
-	  e = sx1272.receivePacketTimeoutACK(5);
+      e = sx1272.receivePacketTimeout(w_timer);
       
       if (!e && sx1272._requestACK_indicator) {
          sprintf(sprintf_buf,"^$ACK requested by %x\n", sx1272.packet_received.src);                   
