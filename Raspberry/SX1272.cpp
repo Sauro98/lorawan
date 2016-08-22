@@ -3675,7 +3675,7 @@ uint8_t SX1272::setACK()
 		}
 
 		writeRegister(REG_FIFO, ACK.fPort);
-		writeRegister(REG_PAYLOAD_LENGTH_LORA,8 + 4);
+		writeRegister(REG_PAYLOAD_LENGTH_LORA,1+4+1+2+1+2);
         writeRegister(REG_FIFO, ACK.data[0]);	// Writing the ACK in FIFO
         writeRegister(REG_FIFO, ACK.data[1]);	// Writing the ACK in FIFO
 
@@ -4463,7 +4463,7 @@ int8_t SX1272::getPacket(uint16_t wait)
 				//Test to be removed in days
 				printf(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
-				printf("hex : %04x , dec : %d\n",packet_received.data[i], packet_received.data[i]);
+				printf("hex : %04x , dec : %d , char %c\n",packet_received.data[i], packet_received.data[i], (char)packet_received.data[i]);
             }
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);
