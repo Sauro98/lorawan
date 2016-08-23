@@ -1748,6 +1748,7 @@ bool sendDBContent(){
 		else {
 			printf("row is short enough to be sent\n");
 			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), MAX_TIMEOUT);
+			printf("res : %d \n", res);
 			if (!res) {
 				printf("packet sent and ack received, time to remove it from database");
 				removeFromDatabase(reader,row);
