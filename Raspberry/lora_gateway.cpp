@@ -184,6 +184,7 @@
  
 #include "SX1272.h"
 #include <string>
+#include<stdlib>
 #include<curl/curl.h>
 #include "dist/json/json.h"
 
@@ -930,10 +931,10 @@ void loop(void)
 	  if (!e) {
 
 		  //Classe ReceivedPacket creata da Ivano, salva, analizza e invia al database le informazioni contenute nel pacchetto ricevuto
-		  //@param 1 : originalPacket : il pacchetto ricevuto dal lora
-		  //@param 2 : _gw_id : l'identificativo del gateway nella rete
-		  //@param 3 : _debug : settare a true per vedere i log di debug, a false per nasconderli. Se si omette questo parametro è automaticamente settato a false  
-		  ReceivedPacket packet = ReceivedPacket(sx1272.packet_received, GW_ID, true);
+		  //param 1 : originalPacket : il pacchetto ricevuto dal lora
+		  //param 2 : _gw_id : l'identificativo del gateway nella rete
+		  //param 3 : _debug : settare a true per vedere i log di debug, a false per nasconderli. Se si omette questo parametro è automaticamente settato a false  
+		  ReceivedPacket packet = ReceivedPacket(sx1272.packet_received, GW_ID, false);
 
 		  //In caso ci servisse inviare comandi al LORA
 		  int a = 0;
@@ -967,6 +968,8 @@ void loop(void)
 			  printf("curl failed \n");
 		  }
 
+		  Json::Value root(readBuffer);
+		  std::cin >> root;
 		 
 
 #if not defined ARDUINO && defined WINPUT
