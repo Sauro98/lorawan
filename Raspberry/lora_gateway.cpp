@@ -934,7 +934,7 @@ void loop(void)
         packet.printPacket();
 		//qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		packet.issueAddToDatabaseCommand();
-		printf(Systen("curl http://localhost:28017/messages/test/"));
+		printf(System("curl http://localhost:28017/messages/test/"));
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
         // that has still not be terminated
