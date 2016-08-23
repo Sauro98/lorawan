@@ -1712,7 +1712,7 @@ bool sendDBContent(){
 	//Part of code to get each row of the table as a string
 	Json::Value root;
 	Json::Reader reader;
-	Json::Writer writer;
+	Json::FastWriter writer;
 	bool valid = reader.parse(readBuffer, root);
 	if (valid) {
 	const Json::Value rows = root["rows"];
@@ -1723,6 +1723,8 @@ bool sendDBContent(){
 	}
 
 	}
+
+	return true;
 
 }
 
