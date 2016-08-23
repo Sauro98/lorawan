@@ -1750,7 +1750,7 @@ bool sendDBContent(){
 			uint32_t toa = sx1272.getToA(row.length() + 5);
 			CarrierSense();
 			
-			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), MAX_TIMEOUT);
+			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 10000);
 			printf("res : %d \n", res);
 			if (!res) {
 				printf("packet sent and ack received, time to remove it from database");
