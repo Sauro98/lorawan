@@ -5814,8 +5814,8 @@ uint8_t SX1272::getACK(uint16_t wait)
 			// Checking the received ACK
 			if (MID(ACK.src, 25, 32) == NETWORK_ID)
 			{
-				if (MID(ACK.src, 0, 25) == MID(packet_received.src, 0, 25)) {
-					printf("ACK for me!! %04x %04x \n", MID(ACK.src, 0, 25), MID(packet_received.src, 0, 25));
+				if (MID(ACK.src, 0, 25) == NETWORK_ADDRESS) {
+					printf("ACK for me!! %04x %04x \n", MID(ACK.src, 0, 25), NETWORK_ADDRESS);
 					if (ACK.packnum == packet_sent.packnum)
 					{
 
@@ -5864,7 +5864,7 @@ uint8_t SX1272::getACK(uint16_t wait)
 					}
 				}
 				else {
-					printf("ACK of my net but not for me %04x %04x \n", MID(ACK.src, 0, 25), MID(packet_received.src, 0, 25));
+					printf("ACK of my net but not for me %04x %04x \n", MID(ACK.src, 0, 25), NETWORK_ADDRESS);
 				}
 
 			}
