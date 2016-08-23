@@ -970,11 +970,12 @@ void loop(void)
 
 		  Json::Value root;
 		  Json::Reader reader;
+		  Json::StyledWriter writer;
 		  reader.parse(readBuffer, root);
 		  const Json::Value rows= root["rows"];
 		  for (int a = 0; a < rows.size(); ++a) {
 			  Json::Value item = rows[a];
-			  printf("id : %s \n",item.asString().c_str());
+			  printf("row : %s \n",writer.write(item).c_str());
 		  }
 
 #if not defined ARDUINO && defined WINPUT
