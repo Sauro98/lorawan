@@ -1703,7 +1703,7 @@ bool sendDBContent(){
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-		printf("curl succesful");
+		printf("curl succesful\n");
 		//printf("curl result :  \n %s\n", readBuffer.c_str());
 	}else{
 		printf("curl failed \n");
@@ -1722,6 +1722,13 @@ bool sendDBContent(){
 		Json::Value item = rows[a];
 		std::string row = writer.write(item);
 		printf("row : %s \n", row.c_str());
+		int lenght = row.length();
+		if (lenght > 241) {
+			printf("to cut\n");
+		}
+		else {
+			printf("short enough\n");
+		}
 	}
 
 	}
