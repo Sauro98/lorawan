@@ -3,7 +3,7 @@ include radio.makefile
 lora_gateway: lora_gateway.o arduPi.o SX1272.o
 	g++ -lrt -lpthread lora_gateway.o arduPi.o SX1272.o -o lora_gateway	
 
-lora_gateway_pi2: lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o 
+lora_gateway_pi2: lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o Json.o
 	g++ -lrt -lpthread lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o -o lora_gateway_pi2 -lcurl
 	rm -f lora_gateway
 	ln -s lora_gateway_pi2 ./lora_gateway
@@ -34,6 +34,9 @@ lora_gateway_pi2_winput.o: lora_gateway.cpp
 
 ReceivedPacketsHandler.o: ReceivedPacketsHandler.cpp ReceivedPacketsHandler.h
 	g++ -c ReceivedPacketsHandler.cpp -o ReceivedPacketsHandler.o
+
+Json.o: dist/jsoncpp.cpp dist/json/json.h
+	g++ -c dist/jsoncpp.cpp -o dist/json.o
 
 arduPi.o: arduPi.cpp arduPi.h
 	g++ -c arduPi.cpp -o arduPi.o	
