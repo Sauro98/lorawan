@@ -36,7 +36,7 @@ ReceivedPacketsHandler.o: ReceivedPacketsHandler.cpp ReceivedPacketsHandler.h
 	g++ -c ReceivedPacketsHandler.cpp -o ReceivedPacketsHandler.o
 
 Json.o: dist/jsoncpp.cpp dist/json/json.h dist/json/json-forwards.h
-	g++ -c dist/jsoncpp.cpp -o dist/json.o
+	g++ -c dist/jsoncpp.cpp -o dist/Json.o
 
 arduPi.o: arduPi.cpp arduPi.h
 	g++ -c arduPi.cpp -o arduPi.o	
