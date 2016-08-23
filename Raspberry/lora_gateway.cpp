@@ -963,21 +963,22 @@ void loop(void)
 			  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 			  res = curl_easy_perform(curl);
 			  curl_easy_cleanup(curl);
-			  printf("curl result :  \n %s\n", readBuffer.c_str());
+			  //printf("curl result :  \n %s\n", readBuffer.c_str());
 		  }else{
-			  printf("curl failed \n");
+			  //printf("curl failed \n");
 		  }
 
 		  Json::Value root;
 		  Json::Reader reader;
 		  Json::StyledWriter writer;
-		  reader.parse(readBuffer, root);
-		  const Json::Value rows= root["rows"];
-		  for (int a = 0; a < rows.size(); ++a) {
-			  Json::Value item = rows[a];
-			  printf("row : %s \n",writer.write(item).c_str());
+		  bool valid = reader.parse(readBuffer, root);
+		  if (valid) {
+			  const Json::Value rows = root["rows"];
+			  for (int a = 0; a < rows.size(); ++a) {
+				  Json::Value item = rows[a];
+				  printf("row : %s \n", writer.write(item).c_str());
+			  }
 		  }
-
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
         // that has still not be terminated
