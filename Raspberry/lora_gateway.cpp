@@ -956,7 +956,8 @@ void loop(void)
 		  //
 		  std::string readBuffer;
 		  printf("deleting row with pacchetto = 2\n");
-		  system("mongo --eval 'messages.test.remove({\"packet\":2}'");
+		  system("mongo --eval 'use messages'");
+		  system("mongo --eval 'db.test.remove({\"packet\":2}'");
 		  curl = curl_easy_init();
 		  if (curl) {
 			  curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:28017/messages/test/");
