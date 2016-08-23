@@ -971,9 +971,11 @@ void loop(void)
 		  Json::Value root;
 		  Json::Reader reader;
 		  reader.parse(readBuffer, root);
-
-			int rows = root.get("total_rows","-1").asInt();
-			printf("rows : %d \n",rows);
+		  Json::Value rows= root["rows"];
+		  for (int a = 0; a < rows.size(); ++a) {
+			  Json::Value item = rows[index];
+			  printf("id : %s \n",item.get("id").asString());
+		  }
 
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
