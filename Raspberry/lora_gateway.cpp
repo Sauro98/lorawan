@@ -1734,21 +1734,26 @@ bool sendDBContent(){
 	bool valid = reader.parse(readBuffer, root);
 	if (valid) {
 	const Json::Value rows = root["rows"];
+	printf("------------Start loop-----------\n");
 	for (int a = 0; a < rows.size(); ++a) {
+		printf("--cycle %d\n",a+1);
 		Json::Value item = rows[a];
 		std::string row = writer.write(item);
-		printf("row : %s \n", row.c_str());
+		//printf("row : %s \n", row.c_str());
 		int lenght = row.length();
 		if (lenght > 241) {
-			printf("to cut\n");
+			printf("row is too long, it has to be cut\n");
 		}
 		else {
-			printf("short enough\n");
+			printf("row is short enough to be sent\n");
 			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 3000);
 			if (!res) {
+				printf("packet sent and ack received, time to remove it from database");
 				removeFromDatabase(reader,row);
 			}
 		}
+
+		printf("--cycle end\n\n");
 	}
 
 	}
