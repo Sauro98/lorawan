@@ -361,7 +361,10 @@ uint8_t optSW=0x12;
   
 //////////////////////////
 
-
+//Added by Ivano 23/08/2016 for MongoDB
+CURL *curl;
+CURLcode res;
+//
 
 #pragma endregion Variabili globali
 
@@ -947,16 +950,15 @@ void loop(void)
 		  packet.printPacket();
 		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		  packet.issueAddToDatabaseCommand();
-		  //printf(system("curl http://localhost:28017/messages/test/"));
 
+		  //Added by Ivano 23/08/2016
+		  // line to remove row from database
+		  /////system("mongo messages --eval \"db.test.remove({\"pacchetto\":1})\"");
 
-		  //Added by Ivano 23/08/2016 for MongoDB
-		  CURL *curl;
-		  CURLcode res;
-		  //
+		  //Added by Ivano 23/08/2016
+		  //Part of code to get JSON with the content of a table from MongoDB with curl
+		  /*
 		  std::string readBuffer;
-		  printf("deleting row with pacchetto = 2\n");
-		  system("mongo messages --eval \"db.test.remove({\"pacchetto\":1})\"");
 		  curl = curl_easy_init();
 		  if (curl) {
 			  curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:28017/messages/test/");
@@ -964,10 +966,16 @@ void loop(void)
 			  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 			  res = curl_easy_perform(curl);
 			  curl_easy_cleanup(curl);
+			  printf("curl succesful");
 			  //printf("curl result :  \n %s\n", readBuffer.c_str());
 		  }else{
 			  //printf("curl failed \n");
 		  }
+		  */
+
+		  //Added by Ivano 23/08/2016
+		  //Part of code to get each row of the table as a string
+		  /*
 		  Json::Value root;
 		  Json::Reader reader;
 		  Json::StyledWriter writer;
@@ -980,6 +988,7 @@ void loop(void)
 			  }
 
 		  }
+		  */
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
         // that has still not be terminated
