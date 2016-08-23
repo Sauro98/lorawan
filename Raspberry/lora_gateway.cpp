@@ -1684,13 +1684,25 @@ int main (int argc, char *argv[]){
   
   return (0);
 }
-
+//Added by I vano 23/08/2016
+void removeFromDatabase(Json::Reader reader,std::string row) {
+	Json::value jsonRow;
+	bool valid = reader.parse(row, jsonRow);
+	if (valid) {
+		//retreive the id
+		std::string id = jsonRow.get("id", "not valid").asString();
+		// line to remove row from database
+		system("mongo messages --eval \"db.test.remove({\"id\": "+id.c_str()+" })\"");
+	}
+	else {
+		printf("failed to retreive json from row string\n");
+	}
+	
+}
 
 //Added by Ivano 23/08/2016
 bool sendDBContent(){
-	//Added by Ivano 23/08/2016
-	// line to remove row from database
-	/////system("mongo messages --eval \"db.test.remove({\"pacchetto\":1})\"");
+	
 
 	//Added by Ivano 23/08/2016
 	//Part of code to get JSON string with the content of a table from MongoDB with curl
@@ -1728,6 +1740,10 @@ bool sendDBContent(){
 		}
 		else {
 			printf("short enough\n");
+			int res = sx1272.sendPacketTimeoutACK(0, row.c_str(), row.length(), 3000);
+			if (!res) {
+				removeFromDatabase(reader,row);
+			}
 		}
 	}
 
@@ -1736,4 +1752,6 @@ bool sendDBContent(){
 	return true;
 
 }
+
+
 
