@@ -185,6 +185,7 @@
 #include "SX1272.h"
 #include <string>
 #include<curl/curl.h>
+#include "dist/json/json.h"
 
 #pragma region DEFINES_AND_IFDEFS_region
 
