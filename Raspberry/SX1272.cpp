@@ -5260,6 +5260,7 @@ uint8_t SX1272::sendWithTimeout(uint16_t wait)
     if( bitRead(value, 3) == 1 )
     {
         state = 0;	// Packet successfully sent
+		_packetNumber++;
 #if (SX1272_debug_mode > 1)
         printf("## Packet successfully sent ##\n");
         printf("\n");
