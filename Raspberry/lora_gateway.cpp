@@ -872,7 +872,7 @@ void loop(void)
       e = sx1272.receivePacketTimeout(w_timer);
       
 #endif 
-
+#pragma endregion Sezione di invio del pacchetto
 #else 
 
       uint16_t w_timer=1000;
@@ -882,7 +882,7 @@ void loop(void)
         
       e=1;
 
-#pragma endregion Sezione di invio del pacchetto
+
 
 //----------FINE PARTE DA LEGGERE PER CAPIRE COME INVIA UN PACCHETTO---------- 
 
@@ -934,7 +934,7 @@ void loop(void)
         packet.printPacket();
 		//qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		packet.issueAddToDatabaseCommand();
-         
+		printf(Systen("curl http://localhost:28017/messages/test/"));
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
         // that has still not be terminated
