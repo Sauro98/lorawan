@@ -5814,52 +5814,57 @@ uint8_t SX1272::getACK(uint16_t wait)
 			// Checking the received ACK
 			if (MID(ACK.src, 25, 32) == NETWORK_ID)
 			{
-
-				if (ACK.packnum == packet_sent.packnum)
-				{
-
-					if (ACK.data[0] == CORRECT_PACKET)
+				if (MID(ACK.src, 0, 25) == MID(packet_received.src, 0, 25)) {
+					printf("ACK for me!!\n");
+					if (ACK.packnum == packet_sent.packnum)
 					{
-						state = 0;
-						//#if (SX1272_debug_mode > 0)
-						// Printing the received ACK
-						Serial.println("## ACK received:");
-						value = ACK.data[1];
 
-						if (value & 0x80) // The SNR sign bit is 1
+						if (ACK.data[0] == CORRECT_PACKET)
 						{
-							// Invert and divide by 4
-							value = ((~value + 1) & 0xFF) >> 2;
-							_rcv_snr_in_ack = -value;
+							state = 0;
+							//#if (SX1272_debug_mode > 0)
+							// Printing the received ACK
+							Serial.println("## ACK received:");
+							value = ACK.data[1];
+
+							if (value & 0x80) // The SNR sign bit is 1
+							{
+								// Invert and divide by 4
+								value = ((~value + 1) & 0xFF) >> 2;
+								_rcv_snr_in_ack = -value;
+							}
+							else
+							{
+								// Divide by 4
+								_rcv_snr_in_ack = (value & 0xFF) >> 2;
+							}
+
+							Serial.println(_rcv_snr_in_ack);
+							Serial.println("##");
+							Serial.println("");
+							//#endif
 						}
 						else
 						{
-							// Divide by 4
-							_rcv_snr_in_ack = (value & 0xFF) >> 2;
+							state = 1;
+							//#if (SX1272_debug_mode > 0)
+							Serial.println("** N-ACK received **");
+							Serial.println("");
+							//#endif
 						}
 
-						Serial.println(_rcv_snr_in_ack);
-						Serial.println("##");
-						Serial.println("");
-						//#endif
 					}
 					else
 					{
 						state = 1;
 						//#if (SX1272_debug_mode > 0)
-						Serial.println("** N-ACK received **");
+						Serial.println("** ACK number incorrectly received **");
 						Serial.println("");
 						//#endif
 					}
-
 				}
-				else
-				{
-					state = 1;
-					//#if (SX1272_debug_mode > 0)
-					Serial.println("** ACK number incorrectly received **");
-					Serial.println("");
-					//#endif
+				else {
+					printf("ACK of my net but not for me\n");
 				}
 
 			}
