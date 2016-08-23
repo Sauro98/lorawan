@@ -948,8 +948,8 @@ void loop(void)
 
 
 		  //Added by Ivano 23/08/2016 for MongoDB
-		  CURL *curl;
-		  CURLcode res;
+		  curl::CURL *curl;
+		  curl::CURLcode res;
 		  //
 		  std::string readBuffer;
 
