@@ -784,9 +784,9 @@ void loop(void)
 	
 	keyPressBuff[keyIndex]='\0';
 
-        PRINT_CSTSTR("%s","keyboard input : ");
-        PRINT_STR("%s",keyPressBuff);
-        PRINTLN;    
+       // PRINT_CSTSTR("%s","keyboard input : ");
+      //  PRINT_STR("%s",keyPressBuff);
+      //  PRINTLN;    
   }
 #endif
 #pragma endregion Lettura input da monitor seriale
@@ -1437,11 +1437,11 @@ void loop(void)
     if (sendCmd && receivedFromSerial) {
       
       uint8_t pl=strlen((char*)(&cmd[i]));
-      PRINT_CSTSTR("%s","Sending. Length is ");
-      PRINT_VALUE("%d",pl);
-      PRINTLN;
-      PRINT_STR("%s",(char*)(&cmd[i]));
-      PRINTLN;
+      //PRINT_CSTSTR("%s","Sending. Length is ");
+     // PRINT_VALUE("%d",pl);
+      //PRINTLN;
+     // PRINT_STR("%s",(char*)(&cmd[i]));
+     // PRINTLN;
       
 #ifdef LORA_LAS
       if (forTmpDestAddr>=0)
@@ -1466,14 +1466,14 @@ void loop(void)
       // only the DIFS/SIFS mechanism
       // we chose to have a complete control code insytead of using the implementation of the LAS class
       // for better debugging and tests features if needed.    
-      PRINT_CSTSTR("%s","Payload size is ");  
-      PRINT_VALUE("%d",pl);
-      PRINTLN;
+      //PRINT_CSTSTR("%s","Payload size is ");  
+     // PRINT_VALUE("%d",pl);
+     // PRINTLN;
       
       uint32_t toa = sx1272.getToA(pl+5);      
-      PRINT_CSTSTR("%s","ToA is w/5B Libelium header ");
-      PRINT_VALUE("%d",toa);
-      PRINTLN;
+    //  PRINT_CSTSTR("%s","ToA is w/5B Libelium header ");
+    //  PRINT_VALUE("%d",toa);
+    //  PRINTLN;
       
       long startSend, endSend;
       long startSendCad;
@@ -1520,23 +1520,23 @@ void loop(void)
         sx1272.getSNR();
         sx1272.getRSSIpacket();
          
-        sprintf(sprintf_buf,"--- rxlora ACK. SNR=%d RSSIpkt=%d\n", 
+        /*sprintf(sprintf_buf,"--- rxlora ACK. SNR=%d RSSIpkt=%d\n", 
                    sx1272._SNR,
-                   sx1272._RSSIpacket);
+                   sx1272._RSSIpacket);*/
                    
-        PRINT_STR("%s",sprintf_buf);
+       // PRINT_STR("%s",sprintf_buf);
         
         PRINT_CSTSTR("%s","LoRa (ACK) Sent in ");  
       }
       else      
-        PRINT_CSTSTR("%s","LoRa Sent in ");
+      //  PRINT_CSTSTR("%s","LoRa Sent in ");
       
-      PRINT_VALUE("%ld",endSend-startSend);
-      PRINTLN;
+      //PRINT_VALUE("%ld",endSend-startSend);
+     // PRINTLN;
       
-      PRINT_CSTSTR("%s","LoRa Sent w/CAD in ");
-      PRINT_VALUE("%ld",endSend-startSendCad);
-      PRINTLN;      
+     // PRINT_CSTSTR("%s","LoRa Sent w/CAD in ");
+     // PRINT_VALUE("%ld",endSend-startSendCad);
+     // PRINTLN;      
 #endif    
       PRINT_CSTSTR("%s","Packet sent, state ");
       PRINT_VALUE("%d",e);
