@@ -969,7 +969,7 @@ void loop(void)
 		  }
 
 		  Json::Value root(readBuffer);
-		  std::cin >> root;
+		  //std::cin >> root;
 		 
 
 #if not defined ARDUINO && defined WINPUT
