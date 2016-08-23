@@ -1696,7 +1696,7 @@ void removeFromDatabase(Json::Reader reader,std::string row) {
 		std::string command = "mongo messages --eval \"db.test.remove({\"id\": ";
 		command.append(id);
 		command.append("})\"");
-		print("command = %s\n",command.c_str());
+		printf("command = %s\n",command.c_str());
 		system(command.c_str());
 	}
 	else {
