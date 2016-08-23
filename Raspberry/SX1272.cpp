@@ -5698,6 +5698,7 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 		}
 		else
 		{
+			printf("not found \n");
 			state_f = 3;
 			// added by C. Pham
 			Serial.println("no ACK");
