@@ -184,7 +184,6 @@
  
 #include "SX1272.h"
 #include <string>
-#include <curl/curl.h>
 
 #pragma region DEFINES_AND_IFDEFS_region
 
@@ -359,11 +358,24 @@ uint8_t optSW=0x12;
   
 //////////////////////////
 
-
+//Added by Ivano 23/08/2016 for MongoDB
+CURL *curl;
+CURLcode res;
+//
 
 #pragma endregion Variabili globali
 
 #pragma region functions
+
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+	((std::string*)userp)->append((char*)contents, size * nmemb);
+	return size * nmemb;
+}
+
+void setUpCurl() {
+	
+}
 
 long getCmdValue(int &i, char* strBuff=NULL) {
         
@@ -916,26 +928,43 @@ void loop(void)
 // ONLY FOR BASE STATION RECEIVING MESSAGES FROM DEVICE
 ///END/////////////////////////////////////////////////
 
-      if (!e) {
-      	
-      	 //Classe ReceivedPacket creata da Ivano, salva, analizza e invia al database le informazioni contenute nel pacchetto ricevuto
-         //@param 1 : originalPacket : il pacchetto ricevuto dal lora
-         //@param 2 : _gw_id : l'identificativo del gateway nella rete
-		 //@param 3 : _debug : settare a true per vedere i log di debug, a false per nasconderli. Se si omette questo parametro è automaticamente settato a false  
-         ReceivedPacket packet = ReceivedPacket(sx1272.packet_received,GW_ID,false);
+	  if (!e) {
 
-		 //In caso ci servisse inviare comandi al LORA
-		 int a = 0;
-		 for (; a < 4; a++) {
-			 cmd[a] = packet.data[a];
-		 }
-		 cmd[a] = '\0';
+		  //Classe ReceivedPacket creata da Ivano, salva, analizza e invia al database le informazioni contenute nel pacchetto ricevuto
+		  //@param 1 : originalPacket : il pacchetto ricevuto dal lora
+		  //@param 2 : _gw_id : l'identificativo del gateway nella rete
+		  //@param 3 : _debug : settare a true per vedere i log di debug, a false per nasconderli. Se si omette questo parametro è automaticamente settato a false  
+		  ReceivedPacket packet = ReceivedPacket(sx1272.packet_received, GW_ID, false);
 
-		 //Stampa del pacchetto
-        packet.printPacket();
-		//qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
-		packet.issueAddToDatabaseCommand();
-		//printf(system("curl http://localhost:28017/messages/test/"));
+		  //In caso ci servisse inviare comandi al LORA
+		  int a = 0;
+		  for (; a < 4; a++) {
+			  cmd[a] = packet.data[a];
+		  }
+		  cmd[a] = '\0';
+
+		  //Stampa del pacchetto
+		  packet.printPacket();
+		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
+		  packet.issueAddToDatabaseCommand();
+		  //printf(system("curl http://localhost:28017/messages/test/"));
+
+		  std::string readBuffer;
+
+		  curl = curl_easy_init();
+		  if (curl) {
+			  curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:28017/messages/test/");
+			  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+			  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+			  res = curl_easy_perform(curl);
+			  curl_easy_cleanup(curl);
+			  pritnf("curl result :  \n %s\n", readBuffer.c_string());
+		  }else{
+			  pritnf("curl failed \n");
+		  }
+
+		 
+
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
         // that has still not be terminated
