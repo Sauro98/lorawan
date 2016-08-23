@@ -35,7 +35,7 @@ lora_gateway_pi2_winput.o: lora_gateway.cpp
 ReceivedPacketsHandler.o: ReceivedPacketsHandler.cpp ReceivedPacketsHandler.h
 	g++ -c ReceivedPacketsHandler.cpp -o ReceivedPacketsHandler.o
 
-Json.o: dist/jsoncpp.cpp dist/json/json.h
+Json.o: dist/jsoncpp.cpp dist/json/json.h dist/json/json-forwards.h
 	g++ -c dist/jsoncpp.cpp -o dist/json.o
 
 arduPi.o: arduPi.cpp arduPi.h
