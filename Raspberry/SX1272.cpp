@@ -5869,6 +5869,9 @@ uint8_t SX1272::getACK(uint16_t wait)
 				}
 
 			}
+			else {
+				printf("packet from another network \n");
+			}
 		}
 		else
 		{
