@@ -4,8 +4,7 @@ lora_gateway: lora_gateway.o arduPi.o SX1272.o
 	g++ -lrt -lpthread lora_gateway.o arduPi.o SX1272.o -o lora_gateway	
 
 lora_gateway_pi2: lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o 
-	g++ -o sms -L/usr/lib/arm-linux-gnueabihf/sms.o -lcurl
-	g++ -lrt -lpthread lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o -o lora_gateway_pi2
+	g++ -lrt -lpthread lora_gateway_pi2.o arduPi_pi2.o SX1272_pi2.o ReceivedPacketsHandler.o -o lora_gateway_pi2 -lcurl
 	rm -f lora_gateway
 	ln -s lora_gateway_pi2 ./lora_gateway
 
@@ -74,8 +73,6 @@ lora_las_gateway_pi2.o: lora_gateway.cpp
 
 LoRaActivitySharing.o: LoRaActivitySharing.cpp LoRaActivitySharing.h
 	g++ -c LoRaActivitySharing.cpp -o LoRaActivitySharing.o
-
-
 
 #for testing as a very simple end-device
 lora_device: lora_gateway_dev.o arduPi.o SX1272.o
