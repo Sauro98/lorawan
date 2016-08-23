@@ -961,7 +961,7 @@ void loop(void)
 			  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 			  res = curl_easy_perform(curl);
 			  curl_easy_cleanup(curl);
-			  printf("curl result :  \n %s\n", readBuffer.c_string());
+			  printf("curl result :  \n %s\n", readBuffer.c_str());
 		  }else{
 			  printf("curl failed \n");
 		  }
