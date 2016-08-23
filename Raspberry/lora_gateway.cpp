@@ -1746,7 +1746,7 @@ bool sendDBContent(){
 			printf("row is too long, it has to be cut\n");
 		}
 		else {
-			printf("row is short enough to be sent\n");
+			printf("row is short enough to be sent : %d\n",lenght);
 			uint32_t toa = sx1272.getToA(row.length() + 5);
 			CarrierSense();
 			
