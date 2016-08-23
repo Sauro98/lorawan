@@ -969,8 +969,8 @@ void loop(void)
 		  }
 
 		  Json::Value root(readBuffer);
-		  std::string arduino = root.get("timestamp","not valid").asString();
-		 
+			int rows = root.get("total_rows","-1").asInt();
+			printf("rows : %d \n",rows);
 
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
