@@ -974,7 +974,7 @@ void loop(void)
 		  Json::Value rows= root["rows"];
 		  for (int a = 0; a < rows.size(); ++a) {
 			  Json::Value item = rows[index];
-			  printf("id : %s \n",item.get("id").asString());
+			  printf("id : %s \n",item.get("id","invalid").asString());
 		  }
 
 #if not defined ARDUINO && defined WINPUT
