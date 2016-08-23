@@ -86,7 +86,7 @@ void ReceivedPacket::issueAddToDatabaseCommand() {
 
 	std::string command = "curl -d \'";
 	command.append(json);
-	command.append("\' -H \"Content-Type: application/json\" http://localhost:28017/messages/test");
+	command.append("\' -H \"Content-Type: application/json\" http://localhost:28017/messages/test/");
 
 	if (debug) {
 		printf("\nfatto\n");
