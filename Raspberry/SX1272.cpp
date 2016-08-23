@@ -4219,7 +4219,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #if (SX1272_debug_mode > 0)
         printf("## Checking destination ##\n");
 #endif
-
+		printf("destination : %04x\n",_destination);
         // modified by Ivano
         if (MID(_destination,25,32) == NETWORK_ID)
 
