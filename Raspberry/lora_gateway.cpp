@@ -184,6 +184,7 @@
  
 #include "SX1272.h"
 #include <string>
+#include<curl/curl.h>
 
 #pragma region DEFINES_AND_IFDEFS_region
 
@@ -948,8 +949,8 @@ void loop(void)
 
 
 		  //Added by Ivano 23/08/2016 for MongoDB
-		  curl::CURL *curl;
-		  curl::CURLcode res;
+		  CURL *curl;
+		  CURLcode res;
 		  //
 		  std::string readBuffer;
 
