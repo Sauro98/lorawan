@@ -969,7 +969,7 @@ void loop(void)
 		  }
 
 		  Json::Value root(readBuffer);
-		  std::string arduino = root.get("timestamp","not valid");
+		  std::string arduino = root.get("timestamp","not valid").asString();
 		 
 
 #if not defined ARDUINO && defined WINPUT
