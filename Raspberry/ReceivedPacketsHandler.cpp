@@ -157,10 +157,10 @@ std::string ReceivedPacket::generateJSON(){
 
 
 		if (a != pl - 1) {
-			sprintf(buffer, " {\"byte\" : %d}, ", data[a]);
+			sprintf(buffer, " %d, ", data[a]);
 		}
 		else {
-			sprintf(buffer, " {\"byte\" : %d} ", data[a]);
+			sprintf(buffer, "  %d ", data[a]);
 		}
 
 		if (debug) {
