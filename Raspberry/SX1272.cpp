@@ -3648,7 +3648,7 @@ uint8_t SX1272::setACK()
 		ACK.fCtrl = PKT_FCTRL_ACK;
         ACK.type = PKT_TYPE_NO_ACK;
 		//Modificato da Ivano 18/08/2016 ora il dst è a 32 bit
-        ACK.src = NETWORK_ID << 25 | NETWORK_ADDRESS;
+        ACK.src = NETWORK_ID << 25 | MID(packet_received.src,0,25);//Ivano : so that the receiver knows it's for him 
 		ACK.fPort = F_PORT;
         ACK.packnum = packet_received.packnum; // packet number that has been correctly received
         ACK.data[0] = _reception;	// CRC of the received packet
