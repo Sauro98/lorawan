@@ -14,7 +14,7 @@ void ReceivedPacket::printPacket(){
 	printf("\n");
 	printf("--Contenuto (char):  ");
 	for (int a = 0; a < pl; a++) {
-		printf(" %d", (char)data[a]);
+		printf(" %c", (char)data[a]);
 	}
 	printf("\n-----------------------------------------------------------\n");
 	return;
