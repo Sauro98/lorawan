@@ -968,7 +968,10 @@ void loop(void)
 			  printf("curl failed \n");
 		  }
 
-		  Json::Value root(readBuffer);
+		  Json::Value root;
+		  Json::Reader reader;
+		  reader.parse(readBuffer, root);
+
 			int rows = root.get("total_rows","-1").asInt();
 			printf("rows : %d \n",rows);
 
