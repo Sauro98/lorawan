@@ -968,8 +968,8 @@ void loop(void)
 			  printf("curl failed \n");
 		  }
 
-		  Json::Value root;
-		  std::cin >> root;
+		  Json::Value root(readBuffer);
+		  std::string arduino = root.get("timestamp","not valid");
 		 
 
 #if not defined ARDUINO && defined WINPUT
