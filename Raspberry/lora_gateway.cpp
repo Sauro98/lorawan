@@ -358,10 +358,7 @@ uint8_t optSW=0x12;
   
 //////////////////////////
 
-//Added by Ivano 23/08/2016 for MongoDB
-CURL *curl;
-CURLcode res;
-//
+
 
 #pragma endregion Variabili globali
 
@@ -949,6 +946,11 @@ void loop(void)
 		  packet.issueAddToDatabaseCommand();
 		  //printf(system("curl http://localhost:28017/messages/test/"));
 
+
+		  //Added by Ivano 23/08/2016 for MongoDB
+		  CURL *curl;
+		  CURLcode res;
+		  //
 		  std::string readBuffer;
 
 		  curl = curl_easy_init();
