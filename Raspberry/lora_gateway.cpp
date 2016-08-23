@@ -1708,7 +1708,7 @@ void removeFromDatabase(Json::Reader reader,std::string row) {
 //Added by Ivano 23/08/2016
 bool sendDBContent(){
 	
-	delay(100);
+	delay(3000);
 	//Added by Ivano 23/08/2016
 	//Part of code to get JSON string with the content of a table from MongoDB with curl
 	
