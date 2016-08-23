@@ -968,7 +968,7 @@ void loop(void)
 			  printf("curl failed \n");
 		  }
 
-		  Json::Value root(readBuffer);
+		  Json::Value root();
 		  //std::cin >> root;
 		 
 
