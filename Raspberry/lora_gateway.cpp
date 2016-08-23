@@ -1540,23 +1540,23 @@ void loop(void)
         sx1272.getSNR();
         sx1272.getRSSIpacket();
          
-        /*sprintf(sprintf_buf,"--- rxlora ACK. SNR=%d RSSIpkt=%d\n", 
+        sprintf(sprintf_buf,"--- rxlora ACK. SNR=%d RSSIpkt=%d\n", 
                    sx1272._SNR,
-                   sx1272._RSSIpacket);*/
+                   sx1272._RSSIpacket);
                    
-       // PRINT_STR("%s",sprintf_buf);
+        PRINT_STR("%s",sprintf_buf);
         
         PRINT_CSTSTR("%s","LoRa (ACK) Sent in ");  
       }
       else      
-      //  PRINT_CSTSTR("%s","LoRa Sent in ");
+       PRINT_CSTSTR("%s","LoRa Sent in ");
       
-      //PRINT_VALUE("%ld",endSend-startSend);
-     // PRINTLN;
+      PRINT_VALUE("%ld",endSend-startSend);
+      PRINTLN;
       
-     // PRINT_CSTSTR("%s","LoRa Sent w/CAD in ");
-     // PRINT_VALUE("%ld",endSend-startSendCad);
-     // PRINTLN;      
+      PRINT_CSTSTR("%s","LoRa Sent w/CAD in ");
+      PRINT_VALUE("%ld",endSend-startSendCad);
+      PRINTLN;      
 #endif    
       PRINT_CSTSTR("%s","Packet sent, state ");
       PRINT_VALUE("%d",e);
@@ -1747,6 +1747,7 @@ bool sendDBContent(){
 		}
 		else {
 			printf("row is short enough to be sent\n");
+			CarrierSense();
 			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), MAX_TIMEOUT);
 			printf("res : %d \n", res);
 			if (!res) {
