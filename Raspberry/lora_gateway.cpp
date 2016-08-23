@@ -973,7 +973,7 @@ void loop(void)
 		  reader.parse(readBuffer, root);
 		  const Json::Value rows= root.get("rows");
 		  for (int a = 0; a < rows.size(); ++a) {
-			  Json::Value item = rows[index];
+			  Json::Value item = rows[a];
 			  printf("id : %s \n",item.get("id","invalid").asString().c_str());
 		  }
 
