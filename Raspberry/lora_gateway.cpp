@@ -1747,7 +1747,9 @@ bool sendDBContent(){
 		}
 		else {
 			printf("row is short enough to be sent\n");
+			uint32_t toa = sx1272.getToA(row.length() + 5);
 			CarrierSense();
+			
 			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), MAX_TIMEOUT);
 			printf("res : %d \n", res);
 			if (!res) {
