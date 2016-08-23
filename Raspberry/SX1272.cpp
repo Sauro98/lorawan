@@ -5690,9 +5690,10 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	if (state == 0)
 	{
 		// added by C. Pham
-
+		printf("searching for available data\n");
 		if (availableData())
 		{
+			printf("found it \n");
 			state_f = getACK();	// Getting ACK
 		}
 		else
