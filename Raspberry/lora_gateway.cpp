@@ -953,7 +953,7 @@ void loop(void)
 		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		  packet.issueAddToDatabaseCommand();
 		  //Added by Ivano 23/08/2016 -- look at this for the code to send the local database rows with lora
-		  if(cmd[a]=='&')
+		  if(cmd[0]=='&')
 			sendDBContent();
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
