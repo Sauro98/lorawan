@@ -4438,12 +4438,12 @@ int8_t SX1272::getPacket(uint16_t wait)
 			packet_received.fCtrl = readRegister(REG_FIFO); //fctrl
 			packet_received.packnum = readRegister(REG_FIFO) | readRegister(REG_FIFO) << 8 ;	// packNum
             packet_received.fPort = readRegister(REG_FIFO);	// fPort
-			printf("type %04x \n", packet_received.type);//leave out the type
+			/*printf("type %04x \n", packet_received.type);//leave out the type
 			printf("src : %04x  \n", packet_received.src);
 			printf("netID : %04x \n", MID(packet_received.src,25,32));
 			printf("fctrl : %04x\n", packet_received.fCtrl);
 			printf("packnum : %04x \n", packet_received.packnum);
-			printf("fPort : %04x\n", packet_received.fPort);
+			printf("fPort : %04x\n", packet_received.fPort);*/
         }
         else {
             packet_received.type = 0;
@@ -4454,14 +4454,14 @@ int8_t SX1272::getPacket(uint16_t wait)
         //Commentato da Ivano 18/08/2016 lenght non esiste più - > packet_received.length = readRegister(REG_RX_NB_BYTES);
 		int l = readRegister(REG_RX_NB_BYTES) -1 -4 -1 -2 -1;
 		packet_received.length = l;
-		printf("lenght : %d\n",l);
+		//printf("lenght : %d\n",l);
             for(unsigned int i = 0; i < l; i++)
             {
 				//Added by Ivano 18/08/2016
 				//Test to be removed in days
 				printf(" ");
                 packet_received.data[i] = readRegister(REG_FIFO); // Storing payload
-				printf("hex : %04x , dec : %d , char %c\n",packet_received.data[i], packet_received.data[i], (char)packet_received.data[i]);
+				//printf("hex : %04x , dec : %d , char %c\n",packet_received.data[i], packet_received.data[i], (char)packet_received.data[i]);
             }
             // commented by C. Pham
             //packet_received.retry = readRegister(REG_FIFO);

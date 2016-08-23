@@ -7,9 +7,14 @@ void ReceivedPacket::printPacket(){
 	printf("--Pacchetto ricevuto il %s\n",buffer);
 	printf("--Mittente arduino #%d, pacchetto #%d\n",arduinoSenderID,packetNumber);
 	printf("--Sensore #%d\n",sensorID);
-	printf("--Contenuto :  ");
+	printf("--Contenuto (int):  ");
 	for (int a = 0; a < pl; a++) {
 		printf(" %d",data[a]);
+	}
+	printf("\n");
+	printf("--Contenuto (char):  ");
+	for (int a = 0; a < pl; a++) {
+		printf(" %d", (char)data[a]);
 	}
 	printf("\n-----------------------------------------------------------\n");
 	return;
