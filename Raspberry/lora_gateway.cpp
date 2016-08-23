@@ -1686,13 +1686,16 @@ int main (int argc, char *argv[]){
 }
 //Added by I vano 23/08/2016
 void removeFromDatabase(Json::Reader reader,std::string row) {
-	Json::value jsonRow;
+	Json::Value jsonRow;
 	bool valid = reader.parse(row, jsonRow);
 	if (valid) {
 		//retreive the id
 		std::string id = jsonRow.get("id", "not valid").asString();
 		// line to remove row from database
-		system("mongo messages --eval \"db.test.remove({\"id\": "+id.c_str()+" })\"");
+		std::string command = "mongo messages --eval \"db.test.remove({\"id\": ";
+		command.append(id);
+		command.append("})\"");
+		system(command.c_str());
 	}
 	else {
 		printf("failed to retreive json from row string\n");
@@ -1740,7 +1743,7 @@ bool sendDBContent(){
 		}
 		else {
 			printf("short enough\n");
-			int res = sx1272.sendPacketTimeoutACK(0, row.c_str(), row.length(), 3000);
+			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 3000);
 			if (!res) {
 				removeFromDatabase(reader,row);
 			}
