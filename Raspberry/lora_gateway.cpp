@@ -955,7 +955,8 @@ void loop(void)
 		  CURLcode res;
 		  //
 		  std::string readBuffer;
-
+		  printf("deleting row with pacchetto = 2\n");
+		  system("mongo messages.test.delete({\"pacchetto\" : 2})");
 		  curl = curl_easy_init();
 		  if (curl) {
 			  curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:28017/messages/test/");
@@ -967,7 +968,6 @@ void loop(void)
 		  }else{
 			  //printf("curl failed \n");
 		  }
-
 		  Json::Value root;
 		  Json::Reader reader;
 		  Json::StyledWriter writer;
@@ -978,6 +978,7 @@ void loop(void)
 				  Json::Value item = rows[a];
 				  printf("row : %s \n", writer.write(item).c_str());
 			  }
+
 		  }
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
