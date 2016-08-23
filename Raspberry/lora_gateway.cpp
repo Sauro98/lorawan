@@ -950,45 +950,8 @@ void loop(void)
 		  packet.printPacket();
 		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		  packet.issueAddToDatabaseCommand();
-
-		  //Added by Ivano 23/08/2016
-		  // line to remove row from database
-		  /////system("mongo messages --eval \"db.test.remove({\"pacchetto\":1})\"");
-
-		  //Added by Ivano 23/08/2016
-		  //Part of code to get JSON with the content of a table from MongoDB with curl
-		  /*
-		  std::string readBuffer;
-		  curl = curl_easy_init();
-		  if (curl) {
-			  curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:28017/messages/test/");
-			  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-			  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-			  res = curl_easy_perform(curl);
-			  curl_easy_cleanup(curl);
-			  printf("curl succesful");
-			  //printf("curl result :  \n %s\n", readBuffer.c_str());
-		  }else{
-			  //printf("curl failed \n");
-		  }
-		  */
-
-		  //Added by Ivano 23/08/2016
-		  //Part of code to get each row of the table as a string
-		  /*
-		  Json::Value root;
-		  Json::Reader reader;
-		  Json::StyledWriter writer;
-		  bool valid = reader.parse(readBuffer, root);
-		  if (valid) {
-			  const Json::Value rows = root["rows"];
-			  for (int a = 0; a < rows.size(); ++a) {
-				  Json::Value item = rows[a];
-				  printf("row : %s \n", writer.write(item).c_str());
-			  }
-
-		  }
-		  */
+		  //Added by Ivano 23/08/2016 -- look at this for the code to send the local database rows with lora
+		  sendDBContent();
 #if not defined ARDUINO && defined WINPUT
         // if we received something, display again the current input 
         // that has still not be terminated
@@ -1718,5 +1681,48 @@ int main (int argc, char *argv[]){
   }
   
   return (0);
+}
+
+
+//Added by Ivano 23/08/2016
+bool sendDBContent(){
+	//Added by Ivano 23/08/2016
+	// line to remove row from database
+	/////system("mongo messages --eval \"db.test.remove({\"pacchetto\":1})\"");
+
+	//Added by Ivano 23/08/2016
+	//Part of code to get JSON string with the content of a table from MongoDB with curl
+	
+	std::string readBuffer;
+	curl = curl_easy_init();
+	if (curl) {
+		curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:28017/messages/test/");
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+		res = curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+		printf("curl succesful");
+		//printf("curl result :  \n %s\n", readBuffer.c_str());
+	}else{
+		printf("curl failed \n");
+	}
+	
+
+	//Added by Ivano 23/08/2016
+	//Part of code to get each row of the table as a string
+	Json::Value root;
+	Json::Reader reader;
+	Json::Writer writer;
+	bool valid = reader.parse(readBuffer, root);
+	if (valid) {
+	const Json::Value rows = root["rows"];
+	for (int a = 0; a < rows.size(); ++a) {
+		Json::Value item = rows[a];
+		std::string row = writer.write(item);
+		printf("row : %s \n", row.c_str());
+	}
+
+	}
+
 }
 
