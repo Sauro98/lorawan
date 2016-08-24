@@ -1774,7 +1774,7 @@ bool sendDBContent(){
 			PRINT_CSTSTR("%s", "Packet number ");
 			PRINT_VALUE("%d", sx1272._packetNumber);
 			PRINTLN;
-
+			char toolong[] = { 't','o','o',' ','l','o','n','g' };
 			// to test with appkey + encrypted
 			//sx1272.setPacketType(PKT_TYPE_DATA | PKT_FLAG_DATA_WAPPKEY | PKT_FLAG_DATA_ENCRYPTED);
 
@@ -1782,15 +1782,15 @@ bool sendDBContent(){
 
 			if (-1 >= 0) {
 				if (withAck)
-					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(row.c_str()), lenght, 10000);
+					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(toolong), 8, 10000);
 				else
-					e = sx1272.sendPacketTimeout(3, (uint8_t*)(row.c_str()), lenght, 10000);
+					e = sx1272.sendPacketTimeout(3, (uint8_t*)(toolong), 8, 10000);
 			}
 			else {
 				if (withAck)
-					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(row.c_str()), lenght, 10000);
+					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(toolong), 8, 10000);
 				else
-					e = sx1272.sendPacketTimeout(3, (uint8_t*)(row.c_str()), lenght, 10000);
+					e = sx1272.sendPacketTimeout(3, (uint8_t*)(toolong), 8, 10000);
 			}
 
 #ifdef WITH_SEND_LED
