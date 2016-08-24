@@ -493,6 +493,7 @@ public:
 		_send_cad_number = 9;
 #ifdef W_REQUESTED_ACK
 		_requestACK = 0;
+		indice_comandi = 0;
 #endif
 #ifdef W_NET_KEY
 		_my_netkey[0] = net_key_0;
@@ -1453,7 +1454,7 @@ public:
 	//Coda dei comandi in attesa di essere inviati ai rispettivi Arduini
 	Comando coda_comandi[255];
 	//Indice per tenere conto del numero dei comandi in coda
-	int indice_comandi = 0;
+	int indice_comandi;
 
 private:
 
