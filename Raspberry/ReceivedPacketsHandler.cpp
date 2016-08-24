@@ -184,7 +184,7 @@ bool ReceivedPacket::isCommandPacket() {
 	return sensorID == 242 && ((char)data[1] == '@');
 }
 
-Command ReceivedPacket::getCommand() {
+Comando ReceivedPacket::getCommand() {
 	return Command(data[0], (char)data[2]);
 }
 
