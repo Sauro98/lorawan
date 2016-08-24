@@ -1758,7 +1758,7 @@ bool sendDBContent(){
 		printf("--cycle end\n\n");
 	}
 
-	printf(("------------End loop--------\n");
+	printf("------------End loop--------\n");
 
 	}
 
