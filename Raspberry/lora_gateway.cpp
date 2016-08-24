@@ -623,8 +623,8 @@ printf("\n");
 
 
 //Test by Ivano
-	sx1272.addCommand(0xB,'H');
-	sx1272.addCommand(0xB, 'L');
+	//sx1272.addCommand(0xB,'H');
+	//sx1272.addCommand(0xB, 'L');
 }
 
 void CarrierSense() {
@@ -953,7 +953,13 @@ void loop(void)
 		  //Stampa del pacchetto
 		  packet.printPacket();
 		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
-		  packet.issueAddToDatabaseCommand();
+		  if (packet.isCommandPacket()) {
+			  Command c = packet.getCommand();
+			  sx1272.addCommand(c.address, c.command);
+		  }
+		  else {
+			  packet.issueAddToDatabaseCommand();
+		  }
 		  //Added by Ivano 23/08/2016 -- look at this for the code to send the local database rows with lora
 		  if(cmd[0]=='&')
 			sendDBContent();

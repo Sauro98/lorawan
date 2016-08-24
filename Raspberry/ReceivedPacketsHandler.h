@@ -33,8 +33,10 @@ class ReceivedPacket{
 		void printPacket();
 		//esegue un comando curl sulla shell di linux per aggiungere il messaggio al database 
 		void issueAddToDatabaseCommand();
-
-
+		//distingue i pacchetti di comando da quelli di dati
+		bool isCommandPacket();
+		//ottieni il comando ricevuto
+		Comando getCommand();
 	private:
 		std::string generateJSON();
 		void getTime();
