@@ -115,7 +115,7 @@ std::string ReceivedPacket::generateID() {
 	ID += buffer;
 	sprintf(buffer, "%d", packetNumber);
 	ID += buffer;
-	strftime(buffer,50, "%Y:%m:%d-%H:%M:%S", receivedTime);
+	strftime(buffer,50, "%Y%m%d%H%M%S", receivedTime);
 	ID += buffer;
 	return ID;
 }

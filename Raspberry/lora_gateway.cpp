@@ -1743,7 +1743,7 @@ bool sendDBContent(){
 		}
 		else {
 			printf("row is short enough to be sent : %d\n",lenght);
-			//uint32_t toa = sx1272.getToA(row.length() + 5);
+			/*//uint32_t toa = sx1272.getToA(row.length() + 5);
 			//CarrierSense();
 			int e;
 			// only the DIFS/SIFS mechanism
@@ -1761,11 +1761,11 @@ bool sendDBContent(){
 			long startSend, endSend;
 			long startSendCad;
 
-			startSendCad = millis();
+			startSendCad = millis();*/
 
 			CarrierSense();
 
-			startSend = millis();
+			/*startSend = millis();
 
 #ifdef WITH_SEND_LED
 			digitalWrite(SEND_LED, HIGH);
@@ -1824,12 +1824,12 @@ bool sendDBContent(){
 			PRINT_CSTSTR("%s", "Packet sent, state ");
 			PRINT_VALUE("%d", e);
 			PRINTLN;
-			//Serial.flush();
+			//Serial.flush();*/
 
 			int res = 3;
 
-			//int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 10000);
-			//printf("res : %d \n", res);
+			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 20000);
+			printf("res : %d \n", res);
 			if (!res) {
 				printf("packet sent and ack received, time to remove it from database");
 				removeFromDatabase(reader,row);
