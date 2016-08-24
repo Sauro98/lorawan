@@ -4112,7 +4112,7 @@ boolean	SX1272::availableData(uint16_t wait)
     boolean forme = false;
     boolean	_hreceived = false;
     unsigned long previous;
-
+	printf("..start..\n");
 #if (SX1272_debug_mode > 0)
     printf("\n");
 #endif
