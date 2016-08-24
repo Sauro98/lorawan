@@ -1732,7 +1732,7 @@ bool sendDBContent(){
 	if (valid) {
 	const Json::Value rows = root["rows"];
 	printf("------------Start loop-----------\n");
-	for (int a = 0; a < rows.size(); ++a) {
+	for (int a = 0; a < 1; ++a) {
 		printf("--cycle %d\n",a+1);
 		Json::Value item = rows[a];
 		std::string row = writer.write(item);
