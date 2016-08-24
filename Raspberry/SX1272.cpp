@@ -4116,9 +4116,7 @@ boolean	SX1272::availableData(uint16_t wait)
 #if (SX1272_debug_mode > 0)
     printf("\n");
 #endif
-	printf("test delay 500 before everything\n");
-	delay(500);
-	printf("done \n");
+	
     previous = millis();
     if( _modem == LORA )
     { // LoRa mode
@@ -4140,7 +4138,9 @@ boolean	SX1272::availableData(uint16_t wait)
             printf("## Valid Header received in LoRa mode ##\n");
 #endif
             _hreceived = true;
-
+			printf("test delay 500 after header received\n");
+			delay(500);
+			printf("done \n");
 #ifdef W_NET_KEY
             // actually, need to wait until 3 bytes have been received
             while( (header < 3) && (millis() - previous < (unsigned long)wait) )
