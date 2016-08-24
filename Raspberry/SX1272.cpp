@@ -4139,7 +4139,7 @@ boolean	SX1272::availableData(uint16_t wait)
             _hreceived = true;
 			//Added by Ivano 24/08/206 
 			//Quando invia dati pesanti come una riga di database (100 e + bytes) ha bisogno di del tempo per riprendersi e leggere correttamente l'ack di ritorno
-			delay(200);
+			delay(200); // Settare il delay a meno di 200 è rischioso, arrivando a 125 non funziona più
 			//non togliere o gli ack di invio delle righe del mongoDB non arrivano corretti
 #ifdef W_NET_KEY
             // actually, need to wait until 3 bytes have been received
