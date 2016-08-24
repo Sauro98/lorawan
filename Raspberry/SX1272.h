@@ -430,6 +430,24 @@ struct pack
 
 };
 
+
+/*******************************************************************************
+* struct Comando Added by Ivano 24/08/2016
+******************************************************************************/
+
+struct Comando {
+	uint8_t address;  //Indirizzo dell'arduino che deve ricevere il comando
+	char command;     //Comando da inviare all'arduino
+	Comando(uint8_t _address, char _command) {
+		address = _address;
+		command = _command;
+	}
+	Comando() {
+		address = 0;
+		command = 'w';
+	}
+};
+
 /******************************************************************************
  * Class
  ******************************************************************************/
@@ -1209,6 +1227,10 @@ public:
 	*/
 	void setPacketFctrl(uint8_t type);
 
+	//!Added by Ivano 24/008/2016
+	void addCommand(uint8_t address, char command);
+	void deleteCommand(int index);
+	Comando getFirstCommandForDevice(uint8_t address);
 
 
     // SX1272 or SX1276?
@@ -1426,6 +1448,12 @@ public:
   	/*!
    	*/
 	uint16_t _sendTime;
+
+	//!Addad by Ivano 24/08/2016
+	//Coda dei comandi in attesa di essere inviati ai rispettivi Arduini
+	Comando coda_comandi[255];
+	//Indice per tenere conto del numero dei comandi in coda
+	int indice_comandi = 0;
 
 private:
 

@@ -368,6 +368,10 @@ CURLcode res;
 
 #pragma endregion Variabili globali
 
+
+
+
+
 #pragma region functions
 
 bool sendDBContent();
@@ -887,6 +891,7 @@ void loop(void)
       
 #endif 
 #pragma endregion Sezione di invio del pacchetto
+#pragma region receive_packet_region
 #else 
 
       uint16_t w_timer=1000;
@@ -904,7 +909,7 @@ void loop(void)
 
 //----------PARTE DAL LEGGERE PER CAPIRE COME RICEVE UN PACCHETTO (MODIFICATA DA IVANO, ANALISI  DEL PACCHETTO GESTITA NEI FILE ReceivedPacketsHandler.cpp/.h)----------
 
-#pragma region receive_packet_region
+
 #ifdef RECEIVE_ALL
       e = sx1272.receiveAll(w_timer);
 #else
