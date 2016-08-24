@@ -4112,7 +4112,6 @@ boolean	SX1272::availableData(uint16_t wait)
     boolean forme = false;
     boolean	_hreceived = false;
     unsigned long previous;
-	printf("..start..\n");
 #if (SX1272_debug_mode > 0)
     printf("\n");
 #endif
@@ -4138,9 +4137,10 @@ boolean	SX1272::availableData(uint16_t wait)
             printf("## Valid Header received in LoRa mode ##\n");
 #endif
             _hreceived = true;
-			printf("test delay 500 after header received\n");
+			//Added by Ivano 24/08/206 
+			//Quando invia dati pesanti come una riga di database (100 e + bytes) ha bisogno di del tempo per riprendersi e leggere correttamente l'ack di ritorno
 			delay(500);
-			printf("done \n");
+			//non togliere o gli ack di invio delle righe del mongoDB non arrivano corretti
 #ifdef W_NET_KEY
             // actually, need to wait until 3 bytes have been received
             while( (header < 3) && (millis() - previous < (unsigned long)wait) )
@@ -4221,7 +4221,6 @@ boolean	SX1272::availableData(uint16_t wait)
 #if (SX1272_debug_mode > 0)
         printf("## Checking destination ##\n");
 #endif
-		printf("destination : %04x\n",_destination);
         // modified by Ivano
         if (MID(_destination,25,32) == NETWORK_ID)
 
@@ -5692,15 +5691,12 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	if (state == 0)
 	{
 		// added by C. Pham
-		printf("searching for available data\n");
 		if (availableData())
 		{
-			printf("found it \n");
 			state_f = getACK();	// Getting ACK
 		}
 		else
 		{
-			printf("not found \n");
 			state_f = 3;
 			// added by C. Pham
 			Serial.println("no ACK");
