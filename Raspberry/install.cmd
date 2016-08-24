@@ -1,4 +1,5 @@
-apt-get install curl
-apt-get install libcurl4-gnutls-dev
-make lora_gateway_pi2
-./lora_gateway --mode 11
+sudo apt-get install curl
+sudo apt-get install libcurl4-gnutls-dev
+sudo make lora_gateway_pi2
+sudo chmod -x run.cmd
+sudo ./lora_gateway --mode 11

@@ -1,1 +1,1 @@
-./lora_gateway --mode 11
+sudo ./lora_gateway --mode 11
