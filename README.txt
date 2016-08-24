@@ -30,7 +30,7 @@ Prima di eseguire il gateway su una nuova raspberry eseguire lo script install.c
 
 Se si hanno problemi con l'esecuzione dello script digitare il seguente comando :
 
-	 .../lorawan/Raspberry$ sudo chmod -x install.cmd
+	 .../lorawan/Raspberry$ sudo chmod 777 install.cmd
 
 L'esecuzione dello script install.cmd provvederà all'installazione dei pacchetti linux necessari per il gateway
 
@@ -51,4 +51,4 @@ Per eseguire il gateway è sufficente eseguire lo script run.cmd
 
 Se si hanno problemi con l'esecuzione dello script digitare il seguente comando :
 
-	.../lorawan/Raspberry$ sudo chmod -x run.cmd
+	.../lorawan/Raspberry$ sudo chmod 777 run.cmd
