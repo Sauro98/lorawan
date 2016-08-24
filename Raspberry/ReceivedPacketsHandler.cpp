@@ -122,32 +122,32 @@ std::string ReceivedPacket::generateID() {
 
 std::string ReceivedPacket::generateJSON(){
 	char buffer[50];
-	sprintf(buffer, "{ \"id\" : \"%s\",",generateID().c_str());
+	sprintf(buffer, "{ \"id\":\"%s\",",generateID().c_str());
 	if (debug) {
 		printf("%s \n", buffer);
 	}
 	std::string json = buffer;
-	sprintf(buffer," \"arduino\" : %d,",arduinoSenderID);
+	sprintf(buffer," \"ard\":%d,",arduinoSenderID);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	sprintf(buffer," \"sensore\" : %d,",sensorID);
+	sprintf(buffer," \"sens\":%d,",sensorID);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	sprintf(buffer," \"pacchetto\" : %d, ",packetNumber);
+	sprintf(buffer," \"pkt\":%d, ",packetNumber);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	strftime(buffer,50," \"timestamp\" : \"%Y:%m:%d %H:%M:%S\", ",receivedTime);
+	strftime(buffer,50," \"tmstmp\":\"%Y:%m:%d %H:%M:%S\", ",receivedTime);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	sprintf(buffer," \"dati\" : [ ");
+	sprintf(buffer," \"dati\":[");
 	if (debug) {
 		printf("%s \n", buffer);
 	}
@@ -157,10 +157,10 @@ std::string ReceivedPacket::generateJSON(){
 
 
 		if (a != pl - 1) {
-			sprintf(buffer, " %d, ", data[a]);
+			sprintf(buffer, "%d,", data[a]);
 		}
 		else {
-			sprintf(buffer, "  %d ", data[a]);
+			sprintf(buffer, "%d", data[a]);
 		}
 
 		if (debug) {
@@ -169,7 +169,7 @@ std::string ReceivedPacket::generateJSON(){
 		json += buffer;
 	}
 	
-	sprintf(buffer," ]}");
+	sprintf(buffer,"]}");
 	if (debug) {
 		printf("%s \n", buffer);
 	}
