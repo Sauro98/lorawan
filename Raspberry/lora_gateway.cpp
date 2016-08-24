@@ -1780,14 +1780,14 @@ bool sendDBContent(){
 
 			//sx1272.setPacketType(PKT_TYPE_DATA); 
 
-			if (forTmpDestAddr >= 0) {
+			if (-1 >= 0) {
 				if (withAck)
 					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(row.c_str()), lenght, 10000);
 				else
 					e = sx1272.sendPacketTimeout(3, (uint8_t*)(row.c_str()), lenght, 10000);
 			}
 			else {
-				if (withAck || withTmpAck)
+				if (withAck)
 					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(row.c_str()), lenght, 10000);
 				else
 					e = sx1272.sendPacketTimeout(3, (uint8_t*)(row.c_str()), lenght, 10000);
@@ -1799,7 +1799,7 @@ bool sendDBContent(){
 
 			endSend = millis();
 
-			if ((withAck || withTmpAck) && !e) {
+			if ((withAck) && !e) {
 				sx1272.getSNR();
 				sx1272.getRSSIpacket();
 
