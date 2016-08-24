@@ -1826,7 +1826,7 @@ bool sendDBContent(){
 			PRINTLN;
 			//Serial.flush();
 
-
+			int res = 3;
 
 			//int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 10000);
 			//printf("res : %d \n", res);
