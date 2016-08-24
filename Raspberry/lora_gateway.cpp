@@ -1828,7 +1828,7 @@ bool sendDBContent(){
 
 			int res = 3;
 
-			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 20000);
+			res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 20000);
 			printf("res : %d \n", res);
 			if (!res) {
 				printf("packet sent and ack received, time to remove it from database");
