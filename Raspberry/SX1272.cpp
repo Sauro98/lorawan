@@ -5744,7 +5744,6 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 	}
 	else
 	{
-		printf("not able to send??\n");
 		state_f = 1;
 	}
 	if (state == 0)
@@ -5758,12 +5757,10 @@ uint8_t SX1272::sendPacketTimeoutACK(uint8_t dest, uint8_t *payload, uint16_t le
 		{
 			state_f = 3;
 			// added by C. Pham
-			Serial.println("no ACK");
 		}
 	}
 	else
 	{
-		printf("Not able to receive???\n");
 		state_f = 1;
 	}
 
@@ -5880,13 +5877,13 @@ uint8_t SX1272::getACK(uint16_t wait)
 					if (ACK.packnum == packet_sent.packnum)
 					{
 
-						if (ACK.data[0] == CORRECT_PACKET)
+						if ((char)ACK.data[0] == '@')
 						{
 							state = 0;
 							//#if (SX1272_debug_mode > 0)
 							// Printing the received ACK
-							Serial.println("## ACK received:");
-							value = ACK.data[1];
+							Serial.println("## Command received:");
+							/*value = ACK.data[1];
 
 							if (value & 0x80) // The SNR sign bit is 1
 							{
@@ -5902,14 +5899,14 @@ uint8_t SX1272::getACK(uint16_t wait)
 
 							Serial.println(_rcv_snr_in_ack);
 							Serial.println("##");
-							Serial.println("");
+							Serial.println("");*/
 							//#endif
 						}
 						else
 						{
-							state = 1;
+							state = 0;
 							//#if (SX1272_debug_mode > 0)
-							Serial.println("** N-ACK received **");
+							Serial.println("** ACK received **");
 							Serial.println("");
 							//#endif
 						}
