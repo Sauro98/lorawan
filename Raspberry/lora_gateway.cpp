@@ -1692,8 +1692,8 @@ void removeFromDatabase(Json::Reader reader,std::string row) {
 		std::string command = "mongo messages --eval 'db.test.remove({\"id\": \"";
 		command.append(id);
 		command.append("\"})'");
-		printf("command = %s\n",command.c_str());
 		system(command.c_str());
+		printf("Row deleted\n");
 	}
 	else {
 		printf("failed to retreive json from row string\n");
@@ -1703,8 +1703,6 @@ void removeFromDatabase(Json::Reader reader,std::string row) {
 
 //Added by Ivano 23/08/2016
 bool sendDBContent(){
-	
-	delay(3000);
 	//Added by Ivano 23/08/2016
 	//Part of code to get JSON string with the content of a table from MongoDB with curl
 	
@@ -1752,7 +1750,7 @@ bool sendDBContent(){
 			res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 20000);
 			printf("res : %d \n", res);
 			if (!res) {
-				printf("packet sent and ack received, time to remove it from database");
+				printf("packet sent and ack received, time to remove it from database\n");
 				removeFromDatabase(reader,row);
 			}
 		}
