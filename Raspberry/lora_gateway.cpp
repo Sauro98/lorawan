@@ -1743,7 +1743,6 @@ bool sendDBContent(){
 		}
 		else {
 			printf("row is short enough to be sent : %d\n",lenght);
-			startSendCad = millis();*/
 
 			CarrierSense();
 
