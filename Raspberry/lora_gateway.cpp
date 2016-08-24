@@ -233,7 +233,7 @@
 #endif
   
 //#define RECEIVE_ALL 
- #define IS_RCV_GATEWAY
+//#define IS_RCV_GATEWAY
 #define IS_SEND_GATEWAY
 //#define CAD_TEST
 //#define LORA_LAS
