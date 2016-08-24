@@ -623,8 +623,8 @@ printf("\n");
 
 
 //Test by Ivano
-	sx1272.addCommand(0xC,'H');
-	sx1272.addCommand(0xC, 'L');
+	sx1272.addCommand(0xB,'H');
+	sx1272.addCommand(0xB, 'L');
 }
 
 void CarrierSense() {
