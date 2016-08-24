@@ -1745,7 +1745,7 @@ bool sendDBContent(){
 			printf("row is short enough to be sent : %d\n",lenght);
 			//uint32_t toa = sx1272.getToA(row.length() + 5);
 			//CarrierSense();
-			
+			int e;
 			// only the DIFS/SIFS mechanism
 			// we chose to have a complete control code insytead of using the implementation of the LAS class
 			// for better debugging and tests features if needed.    
@@ -1820,7 +1820,7 @@ bool sendDBContent(){
 			PRINT_CSTSTR("%s", "LoRa Sent w/CAD in ");
 			PRINT_VALUE("%ld", endSend - startSendCad);
 			PRINTLN;
-#endif    
+ 
 			PRINT_CSTSTR("%s", "Packet sent, state ");
 			PRINT_VALUE("%d", e);
 			PRINTLN;
@@ -1829,7 +1829,7 @@ bool sendDBContent(){
 
 
 			//int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 10000);
-			printf("res : %d \n", res);
+			//printf("res : %d \n", res);
 			if (!res) {
 				printf("packet sent and ack received, time to remove it from database");
 				removeFromDatabase(reader,row);
