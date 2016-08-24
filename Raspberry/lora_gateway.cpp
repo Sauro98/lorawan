@@ -619,6 +619,11 @@ void setup()
   PRINT_CSTSTR("%s","Do CAD test\n");
 #endif 
 printf("\n");
+
+
+
+//Test by Ivano
+
 }
 
 void CarrierSense() {
