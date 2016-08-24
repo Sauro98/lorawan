@@ -955,6 +955,7 @@ void loop(void)
 		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		  if (packet.isCommandPacket()) {
 			  Comando c = packet.getCommand();
+			  printf("Comando ricevuto per il device : %04x, comando : %c", c.address, c.command);
 			  sx1272.addCommand(c.address, c.command);
 		  }
 		  else {
