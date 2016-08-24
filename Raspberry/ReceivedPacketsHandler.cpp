@@ -185,6 +185,6 @@ bool ReceivedPacket::isCommandPacket() {
 }
 
 Comando ReceivedPacket::getCommand() {
-	return Command(data[0], (char)data[2]);
+	return Comando(data[0], (char)data[2]);
 }
 
