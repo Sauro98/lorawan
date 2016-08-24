@@ -233,7 +233,7 @@
 #endif
   
 //#define RECEIVE_ALL 
- //#define IS_RCV_GATEWAY
+ #define IS_RCV_GATEWAY
 #define IS_SEND_GATEWAY
 //#define CAD_TEST
 //#define LORA_LAS
@@ -376,10 +376,6 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 {
 	((std::string*)userp)->append((char*)contents, size * nmemb);
 	return size * nmemb;
-}
-
-void setUpCurl() {
-	
 }
 
 long getCmdValue(int &i, char* strBuff=NULL) {
@@ -1747,10 +1743,92 @@ bool sendDBContent(){
 		}
 		else {
 			printf("row is short enough to be sent : %d\n",lenght);
-			uint32_t toa = sx1272.getToA(row.length() + 5);
-			CarrierSense();
+			//uint32_t toa = sx1272.getToA(row.length() + 5);
+			//CarrierSense();
 			
-			int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 10000);
+			// only the DIFS/SIFS mechanism
+			// we chose to have a complete control code insytead of using the implementation of the LAS class
+			// for better debugging and tests features if needed.    
+			//PRINT_CSTSTR("%s","Payload size is ");  
+			// PRINT_VALUE("%d",pl);
+			// PRINTLN;
+
+			uint32_t toa = sx1272.getToA(lenght + 5);
+			//  PRINT_CSTSTR("%s","ToA is w/5B Libelium header ");
+			//  PRINT_VALUE("%d",toa);
+			//  PRINTLN;
+
+			long startSend, endSend;
+			long startSendCad;
+
+			startSendCad = millis();
+
+			CarrierSense();
+
+			startSend = millis();
+
+#ifdef WITH_SEND_LED
+			digitalWrite(SEND_LED, HIGH);
+#endif
+
+			PRINT_CSTSTR("%s", "Packet number ");
+			PRINT_VALUE("%d", sx1272._packetNumber);
+			PRINTLN;
+
+			// to test with appkey + encrypted
+			//sx1272.setPacketType(PKT_TYPE_DATA | PKT_FLAG_DATA_WAPPKEY | PKT_FLAG_DATA_ENCRYPTED);
+
+			//sx1272.setPacketType(PKT_TYPE_DATA); 
+
+			if (forTmpDestAddr >= 0) {
+				if (withAck)
+					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(row.c_str()), lenght, 10000);
+				else
+					e = sx1272.sendPacketTimeout(3, (uint8_t*)(row.c_str()), lenght, 10000);
+			}
+			else {
+				if (withAck || withTmpAck)
+					e = sx1272.sendPacketTimeoutACK(3, (uint8_t*)(row.c_str()), lenght, 10000);
+				else
+					e = sx1272.sendPacketTimeout(3, (uint8_t*)(row.c_str()), lenght, 10000);
+			}
+
+#ifdef WITH_SEND_LED
+			digitalWrite(SEND_LED, LOW);
+#endif
+
+			endSend = millis();
+
+			if ((withAck || withTmpAck) && !e) {
+				sx1272.getSNR();
+				sx1272.getRSSIpacket();
+
+				sprintf(sprintf_buf, "--- rxlora ACK. SNR=%d RSSIpkt=%d\n",
+					sx1272._SNR,
+					sx1272._RSSIpacket);
+
+				PRINT_STR("%s", sprintf_buf);
+
+				PRINT_CSTSTR("%s", "LoRa (ACK) Sent in ");
+			}
+			else
+				PRINT_CSTSTR("%s", "LoRa Sent in ");
+
+			PRINT_VALUE("%ld", endSend - startSend);
+			PRINTLN;
+
+			PRINT_CSTSTR("%s", "LoRa Sent w/CAD in ");
+			PRINT_VALUE("%ld", endSend - startSendCad);
+			PRINTLN;
+#endif    
+			PRINT_CSTSTR("%s", "Packet sent, state ");
+			PRINT_VALUE("%d", e);
+			PRINTLN;
+			//Serial.flush();
+
+
+
+			//int res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 10000);
 			printf("res : %d \n", res);
 			if (!res) {
 				printf("packet sent and ack received, time to remove it from database");
