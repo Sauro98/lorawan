@@ -954,7 +954,7 @@ void loop(void)
 		  packet.printPacket();
 		  //qui viene fatto girare il comando nella shell di linux dove inserisce il messaggio appena creato nel database mongodb
 		  if (packet.isCommandPacket()) {
-			  Command c = packet.getCommand();
+			  Comando c = packet.getCommand();
 			  sx1272.addCommand(c.address, c.command);
 		  }
 		  else {
