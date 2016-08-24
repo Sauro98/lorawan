@@ -181,7 +181,7 @@ std::string ReceivedPacket::generateJSON(){
 //parte di ricezione dei comandi
 
 bool ReceivedPacket::isCommandPacket() {
-	return sensorID == 255 && ((char)data[1] == '@');
+	return sensorID == 242 && ((char)data[1] == '@');
 }
 
 Command ReceivedPacket::getCommand() {
