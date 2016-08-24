@@ -85,6 +85,48 @@ uint8_t sx1272_CAD_value[11]={0, 62, 31, 16, 16, 8, 9, 5, 3, 1, 1};
 #define MID(k,m,n) LAST((k)>>(m),((n)-(m)))
 
 
+//Added by Ivano 24/08/2016
+//funzioni per la gestione della coda dei comandi
+
+//Inserisce un nuovo comando in coda, se c'è spazio
+void SX1272::addCommand(uint8_t address, char command) {
+	if (indice_comandi < 255) {
+		coda_comandi[indice_comandi] = Comando(address, command);
+		indice_comandi++;
+		printf("#Comando inserito correttamente in coda\n");
+	}
+	else {
+		printf("#Errore inserimento nuovo comando, la coda è piena\n");
+	}
+}
+//Elimina un comando dalla coda dopo averlo inviato
+void SX1272::deleteCommand(int index) {
+	if (index < indice_comandi) {
+		for (int a = index; a < indice_comandi; a++) {
+			coda_comandi[a] = coda_comandi[a + 1];
+		}
+		indice_comandi--;
+		printf("#Comando eliminato dalla lista\n");
+	}
+	else {
+		printf("#Errore, indice non corretto\n");
+	}
+}
+//Ritorna il primo comando disponibile per l'indirizzo voluto
+Comando SX1272::getFirstCommandForDevice(uint8_t address) {
+	for (int a = 0; a < indice_comandi; a++) { //scorri la lista
+		if (coda_comandi[a].address == address) { //trova il primo comando per l'indirizzo
+			Comando c = coda_comandi[a]; //salvalo su una variabile temporanea
+			deleteCommand(a); //eliminalo dalla coda
+			return c; //ritorna il valore della variabile temporanea
+		}
+	}
+
+	return Comando(0, 'w'); //Se l'indirizzo è 0 e il comando è 'w' (wrong) allora vuol dire che non sono stati trovati comandi per il dispositivo
+}
+
+
+
 void SX1272::RxChainCalibration()
 {
     if (_board==SX1276Chip) {
@@ -3649,12 +3691,25 @@ uint8_t SX1272::setACK()
         ACK.type = PKT_TYPE_NO_ACK;
 		//Modificato da Ivano 18/08/2016 ora il dst è a 32 bit
         ACK.src = NETWORK_ID << 25 | MID(packet_received.src,0,25);//Ivano : so that the receiver knows it's for him 
+		//Added by Ivano 24/08/2016
+		uint8_t addr = MID(packet_received.src, 0, 25);
+		Comando c = getFirstCommandForDevice(addr);
+		
+		if (c.command != 'w') {//Comando valido
+			ACK.data[0] = '@'; //@ identifica il comando
+			ACK.data[1] = c.command; // Il comando effettivo
+		}
+		else {//comando non valido
+			ACK.data[0] = 'N'; //N per NULL (nessun comando)
+			ACK.data[1] = 'N'; //N per NULL (nessun comando)
+		}
+
 		ACK.fPort = F_PORT;
         ACK.packnum = packet_received.packnum; // packet number that has been correctly received
-        ACK.data[0] = _reception;	// CRC of the received packet
+        //ACK.data[0] = _reception;	// CRC of the received packet
         // added by C. Pham
         // store the SNR
-        ACK.data[1]= readRegister(REG_PKT_SNR_VALUE);
+        //ACK.data[1]= readRegister(REG_PKT_SNR_VALUE);
         // Setting address pointer in FIFO data buffer
         writeRegister(REG_FIFO_ADDR_PTR, 0x80);
 
