@@ -4116,7 +4116,9 @@ boolean	SX1272::availableData(uint16_t wait)
 #if (SX1272_debug_mode > 0)
     printf("\n");
 #endif
-
+	printf("test delay 500 before everything\n");
+	delay(500);
+	printf("done \n");
     previous = millis();
     if( _modem == LORA )
     { // LoRa mode
