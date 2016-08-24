@@ -1729,7 +1729,7 @@ bool sendDBContent(){
 	bool valid = reader.parse(readBuffer, root);
 	if (valid) {
 	const Json::Value rows = root["rows"];
-	printf("------------Start loop-----------\n");
+	printf("------------Start database loop-----------\n");
 	for (int a = 0; a < rows.size(); ++a) {
 		printf("--cycle %d\n",a+1);
 		Json::Value item = rows[a];
@@ -1757,6 +1757,8 @@ bool sendDBContent(){
 
 		printf("--cycle end\n\n");
 	}
+
+	printf(("------------End loop--------\n");
 
 	}
 
