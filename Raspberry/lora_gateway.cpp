@@ -305,6 +305,7 @@ LASBase loraLAS = LASBase();
 
 #pragma region global_variables_region
 
+
 int dest_addr = DEFAULT_DEST_ADDR;
 
 char cmd[260] = "****************";
