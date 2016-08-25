@@ -85,7 +85,7 @@ uint8_t sx1272_CAD_value[11] = { 0, 62, 31, 16, 16, 8, 9, 5, 3, 1, 1 };
 
 //Added by Ivano 24/08/2016
 //funzioni per la gestione della coda dei comandi
-
+int lastIndex;
 //Inserisce un nuovo comando in coda, se c'è spazio
 void SX1272::addCommand(uint8_t address, char command) {
 	if (indice_comandi < 255) {
@@ -114,9 +114,8 @@ void SX1272::deleteCommand(int index) {
 Comando SX1272::getFirstCommandForDevice(uint8_t address) {
 	for (int a = 0; a < indice_comandi; a++) { //scorri la lista
 		if (coda_comandi[a].address == address) { //trova il primo comando per l'indirizzo
-			Comando c = coda_comandi[a]; //salvalo su una variabile temporanea
-			deleteCommand(a); //eliminalo dalla coda
-			return c; //ritorna il valore della variabile temporanea
+			lastIndex = a;
+			return coda_comandi[a]; 
 		}
 	}
 
@@ -3913,7 +3912,7 @@ uint8_t SX1272::receivePacketTimeout(uint16_t wait)
 		if (state == 5 && state_f == 0) {
 
 			state = setACK();
-
+			
 			if (state == 0)
 			{
 				// perform carrier sense before sending the ack
@@ -3933,6 +3932,9 @@ uint8_t SX1272::receivePacketTimeout(uint16_t wait)
 				state = sendWithTimeout();
 				if (state == 0)
 				{
+					if ((char)ACK.data[0] != 'N') {
+						deleteCommand(lastIndex);
+					}
 					state_f = 0;
 #if (SX1272_debug_mode > 1)
 					printf("This last packet was an ACK, so ...\n");
