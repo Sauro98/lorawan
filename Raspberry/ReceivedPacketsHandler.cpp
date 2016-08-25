@@ -131,7 +131,7 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	sprintf(buffer, " \"node\":%d,", NETWORK_ID <<25 | NETWORK_ADDRESS);
+	sprintf(buffer, " \"node\":%x,", NETWORK_ID <<25 | NETWORK_ADDRESS);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
