@@ -181,10 +181,15 @@ std::string ReceivedPacket::generateJSON(){
 //parte di ricezione dei comandi
 
 bool ReceivedPacket::isCommandPacket() {
-	return sensorID == 95 && ((char)data[1] == '@');
+	return MID(arduinoSenderID,0,25) == 0x00;
 }
 
 Comando ReceivedPacket::getCommand() {
-	return Comando(data[0], (char)data[2]);
+	if (sensorID == 95 && data[0] == '@') {
+		return Comando(data[0], (char)data[2]);
+	}
+	else {
+		return Comando(0, 'w');
+	}
 }
 
