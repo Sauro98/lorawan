@@ -184,7 +184,7 @@ bool ReceivedPacket::isCommandPacket() {
 }
 
 Comando ReceivedPacket::getCommand() {
-	if (sensorID == 95 && data[0] == '@') {
+	if ((char)sensorID == '_' && data[1] == '@') {
 		return Comando(data[0], (char)data[2]);
 	}
 	else {
