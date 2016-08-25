@@ -1,5 +1,4 @@
 #include "ReceivedPacketsHandler.h"	
-#include "SX1272.h"
 void ReceivedPacket::printPacket(){
 	char buffer[26];
 	strftime(buffer, 26, "%Y:%m:%d %H:%M:%S", receivedTime);

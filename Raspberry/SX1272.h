@@ -352,6 +352,8 @@ const uint8_t INCORRECT_PACKET = 1;
 //
 
 
+#define LAST(k,n) ((k) & ((1<<(n))-1))
+#define MID(k,m,n) LAST((k)>>(m),((n)-(m)))
 //! Structure :
 /*!
 */
