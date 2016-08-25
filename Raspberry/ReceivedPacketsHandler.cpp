@@ -126,7 +126,7 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	std::string json = buffer;
-	sprintf(buffer," \"dev\":%d,",arduinoSenderID);
+	sprintf(buffer," \"dev\":%lu,",arduinoSenderID);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
