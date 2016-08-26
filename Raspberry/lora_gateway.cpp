@@ -1753,11 +1753,9 @@ bool sendDBContent() {
 			payload[2] = item.get("pkt", 0).asInt();
 			//Get time
 			std::string time_string = item.get("tmst","").asString();
-			const char* time_char = time_string.c_str();
-			printf("time string : \"%s\"\n",time_char);
+			const char* time_char = time_string.c_str(); //Se uso time_string.c_str() non funziona, devo per forza usare const char
 			struct tm* tm;
 			strptime(time_char,"%Y/%m/%d %H:%M:%S", tm);
-			//time_t t = mktime(&tm);
 			//put time
 			payload[3] = tm->tm_year;
 			payload[4] = tm->tm_mon;
