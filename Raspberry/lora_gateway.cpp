@@ -1763,14 +1763,22 @@ bool sendDBContent() {
 				printf("row is short enough to be sent : %d\n", lenght);
 
 				CarrierSense();
-				int data_index = 0;
-				uint8_t data[256];
+				int payload_index = 0;
+				uint8_t payload[256];
 
-				data[0] = item.get("dev", "0").asInt();
+				payload[0] = item.get("dev", 0).asInt();
+				payload[1] = item.get("sens", 0).asInt();
+				payload[2] = item.get("pkt", 0).asInt();
+				payload_index += 3;
+				const Json::Value data = item["data"];
+				for (int b = 0; b < data.size(); b++) {
+					payload[payload_index] = data[b];
+					payload_index++;
+				}
 
 				int res = 3;
 
-				res = sx1272.sendPacketTimeoutACK(0, (uint8_t*)row.c_str(), row.length(), 20000);
+				res = sx1272.sendPacketTimeoutACK(0, payload, payload_index, 20000);
 				printf("res : %d \n", res);
 				if (!res) {
 					printf("packet sent and ack received, time to remove it from database\n");
@@ -1783,6 +1791,9 @@ bool sendDBContent() {
 
 		printf("------------End loop--------\n");
 
+	}
+	else {
+		printf("There has been a problem retreiving data from MongoDB. Is it running?\n");
 	}
 
 	return true;
