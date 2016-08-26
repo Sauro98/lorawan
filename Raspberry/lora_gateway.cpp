@@ -187,7 +187,8 @@
 #include <stdlib.h>
 #include<curl/curl.h>
 #include "dist/json/json.h"
-
+#include <sys/time.h>//for formatting the timestamp
+#include <time.h>//for formatting the timestamp
 #pragma region DEFINES_AND_IFDEFS_region
 
 #define GW_ID 0
@@ -1749,8 +1750,20 @@ bool sendDBContent() {
 			uint8_t payload[256];
 			payload[0] = item.get("dev", 0).asInt();
 			payload[1] = item.get("sens", 0).asInt();
-			payload[2] = item.get("pkt", 0).asInt();				
-			payload_index += 3;								//costruzione del nuovo pacchetto
+			payload[2] = item.get("pkt", 0).asInt();
+			//Get time
+			std::string time_string = item.get("tmst","").asString();
+			struct tm* tm;
+			strptime(time_string.c_str(), "%Y:%m:%d %H:%M:%S", &tm);
+			//time_t t = mktime(&tm);
+			//put time
+			payload[3] = tm.tm_year;
+			payload[4] = tm.tm_mon;
+			payload[5] = tm.tm_mday;
+			payload[6] = tm.tm_hour;
+			payload[7] = tm.tm_min;
+			payload[8] = tm.tm_sec;
+			payload_index += 9;								//costruzione del nuovo pacchetto
 			const Json::Value data = item["data"];
 			for (int b = 0; b < data.size(); b++) {
 				payload[payload_index] = data[b].asInt();
