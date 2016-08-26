@@ -28,7 +28,7 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	if (debug) {
 		printf("\n----------START OF A NEW PACKET----------\n");
 	}
-	arduinoSenderID = originalPacket.src;
+	arduinoSenderID = originalPacket.src & 0x7F;//i primi 7 bit
 	packetNumber = originalPacket.packnum;
 	gw_id = _gw_id;
 	//salva il timestamp dell'orario di ricezione del pacchetto in formato AAAA-MM-GG OO-MM-SS
