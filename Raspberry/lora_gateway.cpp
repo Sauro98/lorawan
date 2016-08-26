@@ -1753,6 +1753,7 @@ bool sendDBContent() {
 			payload[2] = item.get("pkt", 0).asInt();
 			//Get time
 			std::string time_string = item.get("tmst","").asString();
+			printf("time string : %s\n",time_string.c_str());
 			struct tm* tm;
 			strptime(time_string.c_str(), "%Y:%m:%d %H:%M:%S", tm);
 			//time_t t = mktime(&tm);
