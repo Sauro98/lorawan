@@ -142,7 +142,7 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	strftime(buffer,50," \"tmst\":\"%Y:%m:%d %H:%M:%S\", ",receivedTime);
+	strftime(buffer,50," \"tmst\":\"%Y%m%dT%H:%M:%S\", ",receivedTime);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
