@@ -1701,23 +1701,13 @@ int main(int argc, char *argv[]) {
 	return (0);
 }
 //Added by I vano 23/08/2016
-void removeFromDatabase(Json::Reader reader, std::string row) {
-	Json::Value jsonRow;
-	bool valid = reader.parse(row, jsonRow);
-	if (valid) {
-		//retreive the id
-		std::string id = jsonRow.get("id", "not valid").asString();
+void removeFromDatabase(std::string id) {
 		// line to remove row from database
 		std::string command = "mongo messages --eval 'db.test.remove({\"id\": \"";
 		command.append(id);
 		command.append("\"})'");
 		system(command.c_str());
-		printf("Row deleted\n");
-	}
-	else {
-		printf("failed to retreive json from row string\n");
-	}
-
+		printf("Row deletion command sent\n");
 }
 
 //Added by Ivano 23/08/2016
@@ -1753,38 +1743,29 @@ bool sendDBContent() {
 		for (int a = 0; a < rows.size(); ++a) {
 			printf("--cycle %d\n", a + 1);
 			Json::Value item = rows[a];
-			std::string row = writer.write(item);
-			//printf("row : %s \n", row.c_str());
-			int lenght = row.length();
-			if (lenght > 241) {
-				printf("row is too long, it has to be cut\n");
+			std::string id = item.get("id", "_").asString();//salvo l'id della riga per l'eliminazione
+			CarrierSense();//eseguo il carrier sense prima di inviare il pacchetto
+			int payload_index = 0;
+			uint8_t payload[256];
+			payload[0] = item.get("dev", 0).asInt();
+			payload[1] = item.get("sens", 0).asInt();
+			payload[2] = item.get("pkt", 0).asInt();				
+			payload_index += 3;								//costruzione del nuovo pacchetto
+			const Json::Value data = item["data"];
+			for (int b = 0; b < data.size(); b++) {
+				payload[payload_index] = data[b].asInt();
+				payload_index++;
 			}
-			else {
-				printf("row is short enough to be sent : %d\n", lenght);
 
-				CarrierSense();
-				int payload_index = 0;
-				uint8_t payload[256];
-
-				payload[0] = item.get("dev", 0).asInt();
-				payload[1] = item.get("sens", 0).asInt();
-				payload[2] = item.get("pkt", 0).asInt();
-				payload_index += 3;
-				const Json::Value data = item["data"];
-				for (int b = 0; b < data.size(); b++) {
-					payload[payload_index] = data[b].asInt();
-					payload_index++;
-				}
-
-				int res = 3;
-
-				res = sx1272.sendPacketTimeoutACK(0, payload, payload_index, 20000);
-				printf("res : %d \n", res);
-				if (!res) {
-					printf("packet sent and ack received, time to remove it from database\n");
-					removeFromDatabase(reader, row);
-				}
+			int res = 3;
+			printf("row is short enough to be sent : %d\n", payload_index);
+			res = sx1272.sendPacketTimeoutACK(0, payload, payload_index, 20000);
+			printf("res : %d \n", res);
+			if (!res) {
+				printf("packet sent and ack received, time to remove it from database\n");
+				removeFromDatabase(id);
 			}
+			
 
 			printf("--cycle end\n\n");
 		}
