@@ -1742,7 +1742,7 @@ bool sendDBContent() {
 		const Json::Value rows = root["rows"];
 		printf("------------Start database loop-----------\n");
 		for (int a = 0; a < rows.size(); ++a) {
-			printf("--cycle %d\n", a + 1);
+			printf("--cycle %d/%d\n", a + 1,rows.size());
 			Json::Value item = rows[a];
 			std::string id = item.get("id", "_").asString();//salvo l'id della riga per l'eliminazione
 			CarrierSense();//eseguo il carrier sense prima di inviare il pacchetto
