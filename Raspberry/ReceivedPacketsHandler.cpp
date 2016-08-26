@@ -149,7 +149,7 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	sprintf(buffer," \"dati\":[");
+	sprintf(buffer," \"data\":[");
 	if (debug) {
 		printf("%s \n", buffer);
 	}
