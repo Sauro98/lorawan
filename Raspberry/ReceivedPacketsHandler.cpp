@@ -106,10 +106,8 @@ void ReceivedPacket::issueAddToDatabaseCommand() {
 std::string ReceivedPacket::generateID() {
 	char buffer[50];
 	std::string ID;
-	sprintf(buffer, "%d",gw_id);
-	ID = buffer;
 	sprintf(buffer, "%d", arduinoSenderID);
-	ID += buffer;
+	ID = buffer;
 	sprintf(buffer, "%d", sensorID);
 	ID += buffer;
 	sprintf(buffer, "%d", packetNumber);
@@ -146,7 +144,7 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	strftime(buffer,50," \"tmstmp\":\"%Y:%m:%d %H:%M:%S\", ",receivedTime);
+	strftime(buffer,50," \"tmtp\":\"%Y:%m:%d %H:%M:%S\", ",receivedTime);
 	if (debug) {
 		printf("%s \n", buffer);
 	}

@@ -1763,7 +1763,10 @@ bool sendDBContent() {
 				printf("row is short enough to be sent : %d\n", lenght);
 
 				CarrierSense();
+				int data_index = 0;
+				uint8_t data[256];
 
+				data[0] = item.get("dev", "0").asInt();
 
 				int res = 3;
 
