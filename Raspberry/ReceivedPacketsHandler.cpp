@@ -57,12 +57,11 @@ ReceivedPacket::ReceivedPacket(pack originalPacket, int _gw_id) {
 }
 
 void ReceivedPacket::getTime() {
-	char buffer[30];
+	//char buffer[30];
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	receivedTime = localtime(&tv.tv_sec);
-	strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", receivedTime);
-
+	//strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", receivedTime);
 }
 
 void ReceivedPacket::issueAddToDatabaseCommand() {
@@ -142,7 +141,7 @@ std::string ReceivedPacket::generateJSON(){
 		printf("%s \n", buffer);
 	}
 	json += buffer;
-	strftime(buffer,50," \"tmst\":\"%Y %m %d %H %M %S\", ",receivedTime);
+	strftime(buffer,50," \"tmst\":\"%Y/%m/%d %H:%M:%S\", ",receivedTime);
 	if (debug) {
 		printf("%s \n", buffer);
 	}
