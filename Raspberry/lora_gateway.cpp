@@ -1757,12 +1757,12 @@ bool sendDBContent() {
 			strptime(time_string.c_str(), "%Y:%m:%d %H:%M:%S", &tm);
 			//time_t t = mktime(&tm);
 			//put time
-			payload[3] = tm.tm_year;
-			payload[4] = tm.tm_mon;
-			payload[5] = tm.tm_mday;
-			payload[6] = tm.tm_hour;
-			payload[7] = tm.tm_min;
-			payload[8] = tm.tm_sec;
+			payload[3] = tm->tm_year;
+			payload[4] = tm->tm_mon;
+			payload[5] = tm->tm_mday;
+			payload[6] = tm->tm_hour;
+			payload[7] = tm->tm_min;
+			payload[8] = tm->tm_sec;
 			payload_index += 9;								//costruzione del nuovo pacchetto
 			const Json::Value data = item["data"];
 			for (int b = 0; b < data.size(); b++) {
