@@ -34,20 +34,18 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	//salva il timestamp dell'orario di ricezione del pacchetto in formato AAAA-MM-GG OO-MM-SS
 	getTime();
 
-	int a = 0;
 	//il primo byte del pacchetto rappresenta l'id del sensore che hai fatto scattare l''invio del messaggio
-	sensorID = originalPacket.data[a];
-	a++;
+	sensorID = originalPacket.data[0];
 	//gli altri byte sono i dati effettivi dei sensori
-	pl = originalPacket.length;
+	pl = originalPacket.length-1;
 	if (debug) {
-		printf("packet lenght : %d\n", originalPacket.length);
+		printf("packet lenght : %d\n", originalPacket.length-1);
 	}
-	for (; a< pl + 1 ; a++) {
+	for (int a=0; a< pl; a++) {
 		if (debug) {
-			printf("inside for loop copying %d to position %d of data \n", (uint8_t)sx1272.packet_received.data[a], a - 1);
+			printf("inside for loop copying %d to position %d of data \n", (uint8_t)sx1272.packet_received.data[a+1], a );
 		}
-		data[a - 1] = (uint8_t)originalPacket.data[a];
+		data[a] = (uint8_t)originalPacket.data[a+1];
 	}
 	if (debug) {
 		printf("outside for loop\n");
