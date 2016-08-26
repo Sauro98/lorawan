@@ -1772,7 +1772,7 @@ bool sendDBContent() {
 				payload_index += 3;
 				const Json::Value data = item["data"];
 				for (int b = 0; b < data.size(); b++) {
-					payload[payload_index] = data[b];
+					payload[payload_index] = data[b].asInt();
 					payload_index++;
 				}
 
