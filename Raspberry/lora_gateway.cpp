@@ -1754,7 +1754,7 @@ bool sendDBContent() {
 			//Get time
 			std::string time_string = item.get("tmst","").asString();
 			struct tm* tm;
-			//strptime(time_string.c_str(), "%Y:%m:%d %H:%M:%S", &tm);
+			strptime(time_string.c_str(), "%Y:%m:%d %H:%M:%S", tm);
 			//time_t t = mktime(&tm);
 			//put time
 			payload[3] = tm->tm_year;
