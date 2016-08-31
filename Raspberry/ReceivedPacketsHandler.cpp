@@ -23,7 +23,7 @@ ReceivedPacket::ReceivedPacket(){
 	
 }
 
-ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
+ReceivedPacket::ReceivedPacket(pack originalPacket,bool _debug) {
 	debug = _debug;
 	if (debug) {
 		printf("\n----------START OF A NEW PACKET----------\n");
@@ -52,8 +52,8 @@ ReceivedPacket::ReceivedPacket(pack originalPacket,int _gw_id,bool _debug) {
 	}
 }
 
-ReceivedPacket::ReceivedPacket(pack originalPacket, int _gw_id) {
-	ReceivedPacket(originalPacket, _gw_id, false);
+ReceivedPacket::ReceivedPacket(pack originalPacket) {
+	ReceivedPacket(originalPacket, false);
 }
 
 void ReceivedPacket::getTime() {
