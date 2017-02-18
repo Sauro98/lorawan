@@ -1541,9 +1541,9 @@ void loop(void)
 			}
 			else {
 				if (withAck || withTmpAck)
-					e = sx1272.sendPacketTimeoutACK(dest_addr, (uint8_t*)(&cmd[i]), pl, 10000);
+					e = sx1272.sendPacketTimeoutACK(0, (uint8_t*)(&cmd[i]), pl, 10000);
 				else
-					e = sx1272.sendPacketTimeout(dest_addr, (uint8_t*)(&cmd[i]), pl, 10000);
+					e = sx1272.sendPacketTimeout(0, (uint8_t*)(&cmd[i]), pl, 10000);
 			}
 
 #ifdef WITH_SEND_LED
