@@ -1535,9 +1535,9 @@ void loop(void)
 
 			if (forTmpDestAddr >= 0) {
 				if (withAck)
-					e = sx1272.sendPacketTimeoutACK(forTmpDestAddr, (uint8_t*)(&cmd[i]), pl, 10000);
+					e = sx1272.sendPacketTimeoutACK(0, (uint8_t*)(&cmd[i]), pl, 10000);
 				else
-					e = sx1272.sendPacketTimeout(forTmpDestAddr, (uint8_t*)(&cmd[i]), pl, 10000);
+					e = sx1272.sendPacketTimeout(0, (uint8_t*)(&cmd[i]), pl, 10000);
 			}
 			else {
 				if (withAck || withTmpAck)
