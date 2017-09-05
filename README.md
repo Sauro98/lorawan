@@ -1,9 +1,12 @@
+
+# Old outdated repository, here just for the memories, don't waste your time digging in here
+
 ---------------------------------------LoRa Gateway con protocollo LoRaWAN---------------------------------
 
 						   --Ivano 24/08/2016--
 				----------------------CONFIGURAZIONE---------------------
 
-Ogni rete avr‡ un'identificativo diverso a 7 bit. Questo identificativo si puÚ trovare nel file SX1272.h
+Ogni rete avr√† un'identificativo diverso a 7 bit. Questo identificativo si pu√≤ trovare nel file SX1272.h
 
 #define NETWORK_ID 0x4D      // modificare 0x4D con l'identificativo di rete che si preferisce da
 			     // 0 a 127 in esadecimale
@@ -11,7 +14,7 @@ Ogni rete avr‡ un'identificativo diverso a 7 bit. Questo identificativo si puÚ t
 !!ATTENZIONE!! Per evitare di intercettare pacchetti di altre reti ogni rete deve avere il suo NETWORK_ID unico
 
 Ogni end-device presente nella rete ha un suo network address diverso a 25 bit. 
-Questo identificativo si puÚ trovare nel file SX1272.h
+Questo identificativo si pu√≤ trovare nel file SX1272.h
 
 #define NETWORK_ADDRESS 0xC  // modificare 0xC con l'indirizzo in rete che si preferisce da 0 a (2^25 -1)
 
@@ -19,7 +22,7 @@ Questo identificativo si puÚ trovare nel file SX1272.h
 (raspberry compreso) deve avere il suo NETWORK_ADDRESS unico 
 Due end-device su due reti diverse possono avere NETWORK_ADDRESS uguale.
 
-Nota : perchË un raspberry riceva dei messaggi dagli arduini Ë necessario che il raspberry e gli arduini 
+Nota : perch√® un raspberry riceva dei messaggi dagli arduini √® necessario che il raspberry e gli arduini 
 che fanno riferimanto a lui abbiano lo stesso NETWORK_ID
  
 ----------------------INSTALLAZIONE----------------------
@@ -32,20 +35,20 @@ Se si hanno problemi con l'esecuzione dello script digitare il seguente comando 
 
 	 .../lorawan/Raspberry$ sudo chmod 777 install.cmd
 
-L'esecuzione dello script install.cmd provveder‡ all'installazione dei pacchetti linux necessari per il gateway
+L'esecuzione dello script install.cmd provveder√† all'installazione dei pacchetti linux necessari per il gateway
 
 ------> curl
 ------> libcurl4-gnutls-dev
 
-Se i seguenti pacchetti sono gi‡ installati non ci sar‡ bisogno di fare niente
+Se i seguenti pacchetti sono gi√† installati non ci sar√† bisogno di fare niente
 Se invece  i pacchetti non sono installati premere 'Y' quando richiesto
 
-Alla fine dell'installazione lo script provveder‡ alla compilazione del gateway e sucessivamente alla sua
+Alla fine dell'installazione lo script provveder√† alla compilazione del gateway e sucessivamente alla sua
 esecuzione. Se si volesse uscire dal gateway per delle configurazioni premere Ctrl+z
 
 --------------------ESECUZIONE----------------------------
 
-Per eseguire il gateway Ë sufficente eseguire lo script run.cmd
+Per eseguire il gateway √® sufficente eseguire lo script run.cmd
 
 	.../lorawan/Raspberry$ sudo ./run.cmd 
 
